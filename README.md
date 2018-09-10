@@ -4,7 +4,7 @@
 
 ## Version
 
-Current version: 1.4.2-pre
+Current version: 3.3.0
 
 ## Overview
 
@@ -78,12 +78,16 @@ This section will provide some quick steps to get started with the SDK. To integ
 ### Initial Setup
 **1. Create Developer Account:** Go to the Clover sandbox developer portal at https://sandbox.dev.clover.com/developers/ and create a developer account.
 ![developer_account](/images/developer-account.png)
+
 **2. Create a new application:** Log into developer portal and create a new app - enter app name, unique package name, and check all the clover permissions your application will require to function properly.
 ![create_app](/images/app_create.png)
+
 **3. Application Settings/Credentials:** Once your application is created you can note down the App ID and Secret which will be required in your code for OAuth flow.
 ![appid_secret](/images/appid_secret.png)
-**4.Provide re-direct URL for your OAuth flow:** Enter the redirect URL where Clover should redirect the authorization response to in the site URL field in the Web Configuration settings. The default OAuth response should be "Code".
+
+**4. Provide re-direct URL for your OAuth flow:** Enter the redirect URL where Clover should redirect the authorization response to in the site URL field in the Web Configuration settings. The default OAuth response should be "Code".
 ![app_redirect](/images/app_redirect.png)
+
 **Note:** The developer portal does not currently accept non-http(s) URL schemes. If you have a custom URL scheme for native iOS and Android applications (such as myPaymentApp://clovergoauthresponse), send an email to Clovergo-Integrations@firstdata.com with your App ID and redirect URL request.
 
 **5. Set app permissions:** Your application will require Clover permissions to work correctly. Set your permissions by going to Settings, then Required Permissions menu.
@@ -98,11 +102,16 @@ Please make sure that your application bundle id is the same as the one defined 
 This section describes the OAuth flow steps to get the access token required to initialize the CloverGoDeviceConfiguration object.
 
 ![oauth_flow](/images/oauth_flow.png)
+
 **Step 1.** Invoke the Clover Authorize URL from your pos application using the App ID of your application (Step #3 above). This action will prompt the user to log into clover merchant account, once successfuly logged in they will need to approve the app for the first inital login. Authorize URL for Sandbox Environment: https://sandbox.dev.clover.com/oauth/authorize?client_id={app_id}&response_type=code
+
 **Step 2.** The user will be redirected to the redirect URL set in step 4 above.
+
 **Step 3.** Parse the URI data to get the Merchant ID, Employee ID, Client ID and Code.
+
 **Step 4.** Make a REST call that includes the Client ID (it's the app id), secret, and Code from your backend server to get the access token. https://sandbox.dev.clover.com/oauth/token?client_id={appId}&client_secret={appSecret}&code={codeUrlParam}
 **Note** Please note that the sample application as part of this project provides a hosted service for Step 4. Use your own such service to execute this step.
+
 **Step 5.** Parse the response of step 4 and retreive the access token. The access token provides the Merchant and Employee context to the SDK, all transactions processed will be under this context.
 
 
