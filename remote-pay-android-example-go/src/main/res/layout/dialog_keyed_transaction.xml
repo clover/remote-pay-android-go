@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="11dp">
+
+    <TextView
+        android:id="@+id/cardNumberText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="11dp"
+        android:layout_marginTop="22dp"
+        android:text="Card Number"
+        android:textStyle="bold" />
+
+    <EditText
+        android:id="@+id/cardNumberEditText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/cardNumberText"
+        android:layout_toRightOf="@+id/cardNumberText"
+        android:digits="@string/filter_number"
+        android:hint="1111 1111 1111 1111"
+        android:imeOptions="actionNext"
+        android:inputType="numberDecimal"
+        android:maxLength="16"
+        android:nextFocusForward="@id/expirationEditText"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/expirationText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/cardNumberText"
+        android:layout_marginTop="22dp"
+        android:text="Expiration"
+        android:textStyle="bold" />
+
+
+    <EditText
+        android:id="@+id/expirationEditText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/expirationText"
+        android:layout_alignLeft="@+id/cardNumberEditText"
+        android:layout_alignRight="@+id/cardNumberEditText"
+        android:digits="@string/filter_number"
+        android:hint="MMYY"
+        android:imeOptions="actionNext"
+        android:inputType="numberDecimal"
+        android:maxLength="4"
+        android:nextFocusForward="@id/cvvEditText"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/cvvText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/expirationText"
+        android:layout_marginTop="22dp"
+        android:text="CVV"
+        android:textStyle="bold" />
+
+    <EditText
+        android:id="@+id/cvvEditText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/cvvText"
+        android:layout_alignLeft="@+id/cardNumberEditText"
+        android:layout_alignRight="@+id/cardNumberEditText"
+        android:digits="@string/filter_number"
+        android:hint="123"
+        android:imeOptions="actionDone"
+        android:inputType="numberDecimal"
+        android:maxLength="4"
+        android:textSize="14sp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/cvvText"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="11dp"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/quickFill"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/btn_rounded"
+            android:text="Quick Fill" />
+
+        <Button
+            android:id="@+id/startTransactionBtn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="11dp"
+            android:layout_weight="1"
+            android:background="@drawable/btn_rounded"
+            android:text="Pay" />
+    </LinearLayout>
+</RelativeLayout>

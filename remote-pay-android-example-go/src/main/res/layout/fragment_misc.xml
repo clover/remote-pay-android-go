@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (C) 2016 Clover Network, Inc.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~
+  ~ You may obtain a copy of the License at
+  ~    http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:id="@+id/MiscParentScrollView"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical"
+              android:padding="11dp">
+
+  <ScrollView android:layout_width="match_parent"
+              android:layout_height="match_parent">
+    <LinearLayout android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:orientation="vertical">
+
+      <LinearLayout
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/connectReader450Btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="5dp"
+            android:layout_weight="1"
+            android:background="@drawable/btn_rounded"
+            android:text="Connect RP450"/>
+
+        <Button
+            android:id="@+id/updateReaderBtn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/btn_rounded"
+            android:layout_marginRight="5dp"
+            android:layout_weight="1"
+            android:visibility="gone"
+            android:text="Update Reader"/>
+
+        <Button
+            android:id="@+id/disconnectReaderBtn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_weight="1"
+            android:background="@drawable/btn_rounded"
+            android:text="Disconnect RP450"/>
+      </LinearLayout>
+
+      <EditText
+          android:id="@+id/reader450PrefEditTxt"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_marginLeft="33dp"
+          android:layout_marginRight="33dp"
+          android:gravity="center_horizontal"
+          android:hint="Auto Connect Reader #"
+          android:padding="11dp"/>
+
+      <Button
+          android:id="@+id/connectReader350Btn"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_alignParentLeft="true"
+          android:layout_marginTop="11dp"
+          android:background="@drawable/btn_rounded"
+          android:text="Connect RP350"/>
+
+      <LinearLayout
+          android:id="@+id/TransactionSettings"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:orientation="vertical"
+          android:padding="11dp">
+
+        <TextView
+            android:id="@+id/textView9"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/transaction_settings"
+            android:textSize="24sp"
+            android:textStyle="normal|bold"/>
+
+        <Switch
+            android:id="@+id/ManualSwitch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="11dp"
+            android:text="@string/manual"/>
+
+        <Switch
+            android:id="@+id/SwipeSwitch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="11dp"
+            android:visibility="gone"
+            android:text="@string/swipe"/>
+
+        <Switch
+            android:id="@+id/ChipSwitch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="11dp"
+            android:text="@string/chip"/>
+
+        <Switch
+            android:id="@+id/ContactlessSwitch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="11dp"
+            android:text="@string/contactless"/>
+      </LinearLayout>
+
+      <Button
+          android:id="@+id/getLogsBtn"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_marginTop="11dp"
+          android:background="@drawable/btn_rounded"
+          android:text="Get Logs"/>
+
+      <Button
+          android:id="@+id/readCardDataBtn"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_marginTop="11dp"
+          android:onClick="readCardDataClick"
+          android:background="@drawable/btn_rounded"
+          android:visibility="visible"
+          tools:visibility="visible"
+          android:text="Read Card Data"/>
+    </LinearLayout>
+  </ScrollView>
+</LinearLayout>

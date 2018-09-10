@@ -1,0 +1,101 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="11dp"
+    tools:context="com.example.cloverexamplego.fragments.RegisterFragment">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Enter Amount:" />
+
+    <EditText
+        android:id="@+id/regAmtEditTxt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Amount in Cents"
+        android:inputType="number"
+        android:maxLength="8" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/payment_note_title"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="4dp"/>
+
+    <EditText
+        android:id="@+id/regPaymentNote"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/payment_note_hint"
+        android:maxLines="1"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="11dp"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/regSaleBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="5dp"
+            android:layout_weight="1"
+            android:background="@drawable/btn_rounded_green"
+            android:text="SALE"
+            android:textColor="@color/white_FFFFFF" />
+
+        <Button
+            android:id="@+id/regAuthBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_weight="1"
+            android:background="@drawable/btn_rounded_green"
+            android:text="AUTH"
+            android:textColor="@color/white_FFFFFF" />
+
+        <Button
+            android:id="@+id/regPreAuthBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_weight="1"
+            android:background="@drawable/btn_rounded_green"
+            android:text="PRE AUTH"
+            android:textColor="@color/white_FFFFFF" />
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/regCloseoutButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="11dp"
+        android:background="@drawable/btn_rounded"
+        android:text="@string/closeout_orders" />
+
+    <TextView
+        android:id="@+id/preAuthTitleTxtVw"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/clover_green"
+        android:padding="3dp"
+        android:text="@string/pre_authorizations"
+        android:textColor="@color/white"
+        android:layout_marginTop="10dp"
+        android:visibility="gone"
+        style="@style/TextAppearance.AppCompat.Title"/>
+
+    <ListView
+        android:id="@+id/preAuthListView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="10dp"
+        />
+
+</LinearLayout>

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/offlineAmountLabelTxtVw"
+            style="@style/TextAppearance.AppCompat.Title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginBottom="12dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="4dp"
+            android:text="@string/amount_title" />
+
+        <TextView
+            android:id="@+id/offlineAmountTxtVw"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="@string/payment_example"
+            android:layout_toEndOf="@id/offlineAmountLabelTxtVw"
+            android:layout_alignBaseline="@id/offlineAmountLabelTxtVw"
+            style="@style/TextAppearance.AppCompat.Title"
+            />
+
+        <TextView
+            android:id="@+id/offlinePaymentIdLabelTxtVw"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignStart="@id/offlineAmountLabelTxtVw"
+            android:layout_below="@id/offlineAmountLabelTxtVw"
+            android:text="@string/payment_id_title"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="8dp"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/offlinePaymentIdTxtVw"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@id/offlinePaymentIdLabelTxtVw"
+            android:layout_toEndOf="@id/offlinePaymentIdLabelTxtVw"
+            android:textStyle="bold"
+            tools:text= "@string/payment_id_sample"/>
+
+        <TextView
+            android:id="@+id/offlineCreatedLabelTxtVw"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/created_title"
+            android:layout_alignStart="@id/offlinePaymentIdLabelTxtVw"
+            android:layout_below="@id/offlinePaymentIdLabelTxtVw"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="8dp"
+            android:textStyle="bold"
+            />
+
+        <TextView
+            android:id="@+id/offlineCreatedTxtVw"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@id/offlineCreatedLabelTxtVw"
+            android:layout_toEndOf="@id/offlineCreatedLabelTxtVw"
+            android:textStyle="bold"
+            tools:text="@string/sample_date"/>
+
+        <TextView
+            android:id="@+id/offlineStateLabelTxtVw"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/state_title"
+            android:layout_alignStart="@id/offlineCreatedLabelTxtVw"
+            android:layout_below="@id/offlineCreatedLabelTxtVw"
+            android:layout_marginBottom="4dp"
+            android:layout_marginEnd="8dp"
+            android:textStyle="bold"
+            />
+
+        <TextView
+            android:id="@+id/offlineStateTxtVw"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@id/offlineStateLabelTxtVw"
+            android:layout_toEndOf="@id/offlineStateLabelTxtVw"
+            android:textStyle="bold"
+            tools:text="FAILED"/>
+
+    </RelativeLayout>
+</layout>

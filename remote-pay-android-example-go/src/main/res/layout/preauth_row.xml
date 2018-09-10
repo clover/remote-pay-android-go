@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+  <TextView
+    android:id="@+id/PreAuthNameColumn"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="@string/cardholder_name"
+    android:textSize="12sp"
+    android:textStyle="bold"/>
+
+  <TextView
+    android:id="@+id/PreAuthAmountColumn"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_alignBaseline="@+id/preAuthAmountLabelTxtVw"
+    android:layout_toRightOf="@+id/preAuthAmountLabelTxtVw"
+    android:paddingLeft="10dp"
+    android:text="@string/payment_example"
+    android:textColor="@color/secondary_table_text_color"
+    android:textSize="20sp"/>
+
+  <TextView
+    android:id="@+id/preAuthAmountLabelTxtVw"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_below="@+id/PreAuthNameColumn"
+    android:text="Amount"
+    android:textColor="@color/secondary_table_text_color"
+    android:textSize="20sp"/>
+
+  <TextView
+    android:id="@+id/preAuthOrderIdTxtVw"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_below="@+id/preAuthAmountLabelTxtVw"
+    android:textColor="@color/secondary_table_text_color"
+    android:textSize="16sp"
+    tools:text="Order ID: "/>
+
+  <TextView
+    android:id="@+id/preAuthPayIdTxtVw"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_below="@+id/preAuthOrderIdTxtVw"
+    android:textColor="@color/secondary_table_text_color"
+    android:textSize="16sp"
+    tools:text="Payment ID: "/>
+
+  <TextView
+    android:id="@+id/preAuthExternalPayIdTxtVw"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_below="@+id/preAuthPayIdTxtVw"
+    android:textColor="@color/secondary_table_text_color"
+    android:textSize="16sp"
+    tools:text="External Payment ID: "/>
+</RelativeLayout>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <dimen name="order_table_text_size">20sp</dimen>
+  <dimen name="table_primary_text_size">20sp</dimen>
+  <dimen name="table_tertiary_text_size">16sp</dimen>
+  <dimen name="table_secondary_text_size">18sp</dimen>
+</resources>

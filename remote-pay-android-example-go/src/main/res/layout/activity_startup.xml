@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white_FFFFFF"
+    android:paddingLeft="22dp"
+    android:paddingRight="22dp"
+    tools:context="com.example.cloverexamplego.activities.GoStartupActivity">
+
+    <TextView
+        android:id="@+id/version"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="11dp"
+        android:textSize="20sp"
+        tools:text="VERSION : 1.XX" />
+
+    <ImageView
+        android:id="@+id/logoView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/version"
+        android:layout_centerHorizontal="true"
+        android:paddingLeft="22dp"
+        android:paddingRight="22dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/clover_horizontal" />
+
+    <RadioGroup
+        android:id="@+id/envRadioGrp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/logoView"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/demoEnvRadioBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:checked="true"
+            android:text="DEMO" />
+
+        <RadioButton
+            android:id="@+id/sandboxEnvRadioBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="SANDBOX" />
+
+        <RadioButton
+            android:id="@+id/liveEnvRadioBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="LIVE" />
+    </RadioGroup>
+
+    <LinearLayout
+        android:id="@+id/llGoModes"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/envRadioGrp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="11dp"
+        android:gravity="center_horizontal"
+        android:orientation="vertical">
+
+        <Button
+            android:id="@+id/demoButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="11dp"
+            android:background="@drawable/btn_rounded"
+            android:text="Demo Mode" />
+
+        <Button
+            android:id="@+id/oAuthCodeButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="11dp"
+            android:background="@drawable/btn_rounded"
+            android:text="Get OAUTH Code" />
+
+        <Button
+            android:id="@+id/oAuthTokenButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="11dp"
+            android:background="@drawable/btn_rounded"
+            android:text="Get OAUTH Token" />
+
+        <Button
+            android:id="@+id/demoReadCardBtn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="11dp"
+            android:background="@drawable/btn_rounded"
+            android:visibility="gone"
+            android:text="Read Card Demo Mode" />
+
+        <Switch
+            android:id="@+id/quickChipSwitch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="11dp"
+            android:text="Quick Chip" />
+    </LinearLayout>
+</RelativeLayout>

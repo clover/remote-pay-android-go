@@ -1,0 +1,45 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="11dp">
+
+    <TextView
+        android:id="@+id/itemPaymentStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/authorized" />
+
+    <TextView
+        android:id="@+id/itemPaymentTip"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignEnd="@id/itemPaymentAmount"
+        android:layout_below="@id/itemPaymentAmount"
+        android:text="@string/payment_example_smaller"
+        android:textColor="@color/secondary_table_text_color" />
+
+    <TextView
+        android:id="@+id/itemPaymentAmount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:text="@string/payment_example"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/itemPaymentTipLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@id/itemPaymentTip"
+        android:layout_toStartOf="@id/itemPaymentTip"
+        android:text="@string/tip"
+        android:textColor="@color/secondary_table_text_color" />
+
+    <TextView
+        android:id="@+id/itemPaymentExternalId"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/itemPaymentStatus"
+        android:text="@string/external_id_placeholder"
+        android:textColor="@color/secondary_table_text_color" />
+</RelativeLayout>

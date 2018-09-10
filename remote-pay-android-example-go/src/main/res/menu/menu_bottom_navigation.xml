@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_register"
+        android:enabled="true"
+        android:icon="@android:drawable/ic_menu_myplaces"
+        android:title="@string/action_register_title"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_orders"
+        android:enabled="true"
+        android:icon="@android:drawable/ic_menu_agenda"
+        android:title="@string/action_orders_title"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_misc"
+        android:enabled="true"
+        android:icon="@android:drawable/ic_menu_preferences"
+        android:title="@string/action_misc_title"
+        app:showAsAction="ifRoom" />
+
+    <item android:id="@+id/action_manual_refund"
+          android:enabled="true"
+          android:icon="@drawable/ic_refund_payment"
+          android:title="@string/action_manual_refund_title"
+          app:showAsAction="ifRoom" />
+
+    <item android:id="@+id/action_vault_card"
+          android:enabled="true"
+          android:icon="@drawable/ic_credit_card"
+          android:title="@string/action_vault_card_title"
+          app:showAsAction="ifRoom" />
+</menu>

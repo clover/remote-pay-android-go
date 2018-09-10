@@ -1,0 +1,37 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/OrdersRowLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="11dp">
+
+    <TextView
+        android:id="@+id/itemOrderId"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/order_id_placeholder" />
+
+    <TextView
+        android:id="@+id/itemOrderAmt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:text="@string/orders_total_placeholder"
+        android:textAlignment="viewEnd"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/itemOrderDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/itemOrderAmt"
+        android:text="@string/order_date_placeholder"
+        android:textColor="@color/secondary_table_text_color" />
+
+    <TextView
+        android:id="@+id/itemOrderStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/itemOrderId"
+        android:text="@string/status" />
+</RelativeLayout>

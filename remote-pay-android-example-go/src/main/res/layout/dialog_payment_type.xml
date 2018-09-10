@@ -1,0 +1,67 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:orientation="vertical"
+    android:padding="22dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="@string/select_payment_type"
+        android:textAlignment="center"
+        android:textSize="22sp" />
+
+    <Button
+        android:id="@+id/rp450_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="11dp"
+        android:background="@drawable/btn_rounded"
+        android:clickable="true"
+        android:focusable="true"
+        android:padding="11dp"
+        android:text="@string/payment_type_rp450" />
+
+    <Button
+        android:id="@+id/rp350_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="11dp"
+        android:background="@drawable/btn_rounded"
+        android:clickable="true"
+        android:focusable="true"
+        android:padding="11dp"
+        android:text="@string/payment_type_rp350" />
+
+    <Button
+        android:id="@+id/key_enter_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="11dp"
+        android:background="@drawable/btn_rounded"
+        android:clickable="true"
+        android:focusable="true"
+        android:padding="11dp"
+        android:text="@string/payment_type_key_enter" />
+
+    <Button
+        android:id="@+id/cancel_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/btn_rounded"
+        android:clickable="true"
+        android:focusable="true"
+        android:paddingBottom="11dp"
+        android:paddingLeft="22dp"
+        android:paddingRight="22dp"
+        android:paddingTop="11dp"
+        android:text="@string/cancel" />
+
+</LinearLayout>
