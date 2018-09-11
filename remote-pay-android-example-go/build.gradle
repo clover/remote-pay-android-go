@@ -1,16 +1,11 @@
 buildscript {
   repositories {
     maven { url "https://oss.sonatype.org/content/repositories/releases" }
-    maven { url 'https://maven.fabric.io/public' }
   }
 
-  dependencies {
-    classpath 'io.fabric.tools:gradle:1.25.4'
-  }
 }
 
 apply plugin: 'com.android.application'
-apply plugin: 'io.fabric'
 
 repositories {
   maven { url "https://oss.sonatype.org/content/repositories/releases" }
@@ -60,10 +55,6 @@ dependencies {
   implementation 'com.google.android.gms:play-services-gcm:15.0.1'
   implementation 'com.google.android.gms:play-services-vision:15.0.2'
   implementation 'com.google.code.gson:gson:2.8.1'
-
-  api('com.crashlytics.sdk.android:crashlytics:2.7.0@aar') {
-    transitive = true
-  }
 
   implementation 'com.android.support:support-v4:27.1.1'
   implementation 'com.android.support:design:27.1.1'

@@ -37,14 +37,6 @@
         android:orientation="horizontal">
 
         <RadioButton
-            android:id="@+id/demoEnvRadioBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:checked="true"
-            android:text="DEMO" />
-
-        <RadioButton
             android:id="@+id/sandboxEnvRadioBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -70,13 +62,13 @@
         android:orientation="vertical">
 
         <Button
-            android:id="@+id/demoButton"
+            android:id="@+id/launchButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:layout_marginBottom="11dp"
             android:background="@drawable/btn_rounded"
-            android:text="Demo Mode" />
+            android:text="Launch Sample App" />
 
         <Button
             android:id="@+id/oAuthCodeButton"
@@ -93,15 +85,6 @@
             android:layout_marginBottom="11dp"
             android:background="@drawable/btn_rounded"
             android:text="Get OAUTH Token" />
-
-        <Button
-            android:id="@+id/demoReadCardBtn"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="11dp"
-            android:background="@drawable/btn_rounded"
-            android:visibility="gone"
-            android:text="Read Card Demo Mode" />
 
         <Switch
             android:id="@+id/quickChipSwitch"

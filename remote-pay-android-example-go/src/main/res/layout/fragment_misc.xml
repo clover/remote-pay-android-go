@@ -133,16 +133,6 @@
           android:background="@drawable/btn_rounded"
           android:text="Get Logs"/>
 
-      <Button
-          android:id="@+id/readCardDataBtn"
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          android:layout_marginTop="11dp"
-          android:onClick="readCardDataClick"
-          android:background="@drawable/btn_rounded"
-          android:visibility="visible"
-          tools:visibility="visible"
-          android:text="Read Card Data"/>
     </LinearLayout>
   </ScrollView>
 </LinearLayout>

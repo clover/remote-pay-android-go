@@ -57,7 +57,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-import com.crashlytics.android.Crashlytics;
 import com.example.cloverexamplego.R;
 import com.example.cloverexamplego.dialogs.KeyedTransactionDialog;
 import com.example.cloverexamplego.dialogs.PaymentTypeDialog;
@@ -82,7 +81,6 @@ import com.example.cloverexamplego.utils.DialogHelper;
 import com.example.cloverexamplego.utils.PreferenceUtil;
 import com.firstdata.clovergo.domain.model.Order;
 import com.firstdata.clovergo.domain.model.ReaderInfo;
-import io.fabric.sdk.android.Fabric;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -156,7 +154,6 @@ public class GoPOSActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Fabric.with(this, new Crashlytics());
         setContentView(R.layout.activity_go_pos);
 
         PreferenceUtil.saveString(this, "Device_ID", "");
@@ -180,8 +177,6 @@ public class GoPOSActivity extends Activity {
         mMerchantInfoTxtVw = findViewById(R.id.merchantInfoTxtVw);
 
         mBottomNavigationView = findViewById(R.id.bottom_navigation);
-//        this is the button to disconnect the reader
-//        connectionStatusButton = (Button) findViewById(R.id.ConnectionStatusButton);
         mPayConfListener = new PaymentConfirmationListener() {
             @Override
             public void onRejectClicked(Challenge challenge) { // Reject payment and send the challenge along for logging/reason
@@ -217,9 +212,6 @@ public class GoPOSActivity extends Activity {
             }
         };
 
-        //showProgressDialog("Getting Merchant Info", "Please wait", false);
-        //showRegister();
-
         initCGoConnectorListener();
         initializeReader(RP450);
         cloverConnector = cloverGoConnectorMap.get(RP450);
@@ -235,9 +227,6 @@ public class GoPOSActivity extends Activity {
         } else {
             mBottomNavigationView.setOnNavigationItemSelectedListener(bottomNavigationListener);
             mBottomNavigationView.setSelectedItemId(R.id.action_register);
-//            if (!mStartupParams.getAccessToken().isEmpty() && !isReadCardDemo) {
-////                showProgressDialog("Getting Merchant Info", "Please wait", false);
-//            }
         }
     }
 
@@ -268,9 +257,7 @@ public class GoPOSActivity extends Activity {
             // Need paymentType in addition to goReaderType in case key entered is selected.
             createCloverGoConnector(readerType);
 
-            if (merchantInfo == null) {
-                setDisconnectedStatus();
-            } else {
+            if (merchantInfo != null) {
                 setConnectedStatus(merchantInfo);
             }
         }
@@ -316,15 +303,10 @@ public class GoPOSActivity extends Activity {
                 merchantInfoMap.put(readerInfo.getReaderType(), null);
                 showToast("Disconnected");
                 Log.d(TAG, "disconnected");
-
-                if (goReaderType == readerInfo.getReaderType()) {
-                    setDisconnectedStatus();
-                }
             }
 
             public void onDeviceConnected() {
                 showToast("Connecting...");
-                setConnectingStatus();
             }
 
             @Override
@@ -603,9 +585,6 @@ public class GoPOSActivity extends Activity {
                         mProcessedPaymentsMap.get(response.getPaymentId())
                                 .setTipAmount(response.getTipAmount());
                         showToast("Tip successfully adjusted");
-//                        if (orderTransactionsListener != null) {
-//                            orderTransactionsListener.onTipAdjustAuthResponse(response);
-//                        }
                     }
                 } else {
                     showToast("Tip adjust failed");
@@ -637,8 +616,7 @@ public class GoPOSActivity extends Activity {
 
             @Override
             public void onConfirmPaymentRequest(ConfirmPaymentRequest request) {
-                //TODO: Discuss Clover GO doesn't return Payment Object on Duplicate Transaction
-                if (/*request.getPayment() == null ||*/ request.getChallenges() == null) {
+                if (request.getChallenges() == null) {
                     showToast("Error: The ConfirmPaymentRequest was missing the payment and/or challenges.");
                 } else {
                     currentPayment = request.getPayment();
@@ -664,7 +642,6 @@ public class GoPOSActivity extends Activity {
                 if (response.isSuccess()) {
                     showToast("Closeout is scheduled.");
                 } else {
-                    // showToast("Error scheduling closeout: " + response.getReason());
                     showToast("Error getting current batch's transactions");
                 }
             }
@@ -700,9 +677,6 @@ public class GoPOSActivity extends Activity {
                     if (mProcessedPaymentsMap.get(response.getPaymentId()) != null) {
                         mProcessedPaymentsMap.get(response.getPaymentId()).setStatus(GoPayment.Status.VOIDED);
                     }
-//                    if (orderTransactionsListener != null) {
-//                        orderTransactionsListener.onVoidPaymentResponse(response);
-//                    }
 
                     showToast("Payment successfully voided");
 
@@ -719,9 +693,6 @@ public class GoPOSActivity extends Activity {
                     Credit credit = response.getCredit();
                     final GoNakedRefund nakedRefund = new GoNakedRefund(null, credit.getAmount());
                     goNakedRefunds.add(nakedRefund);
-//                    if (manualRefundsListener != null) {
-//                        manualRefundsListener.onManualRefundResponse(response);
-//                    }
                     showManualRefunds();
                     showToast("Manual Refund successfully processed");
                 } else if (response.getResult() == ResultCode.CANCEL) {
@@ -831,11 +802,6 @@ public class GoPOSActivity extends Activity {
                                         data.addAll(new RowData("Equivalent Track 2", goCardData.getEquivalentTrack2()));
                                     }
 
-                                    //TODO: need to update the SDK to remove the extra 'FFFF'
-//                                    if (goCardData.getPan() != null) {
-//                                        data.addAll(new RowData("PAN", goCardData.getPan()));
-//                                    }
-
                                 }
 
                             }
@@ -902,14 +868,6 @@ public class GoPOSActivity extends Activity {
 
     private void setConnectedStatus(MerchantInfo merchantInfo) {
         mMerchantInfoTxtVw.setText(String.format(merchantInfo.getDeviceInfo().getModel() + " Connected: %s (%s)", merchantInfo.getDeviceInfo().getSerial(), merchantInfo.getMerchantName()));
-    }
-
-    private void setConnectingStatus() {
-//        connectionStatusButton.setText("Connecting...");
-    }
-
-    private void setDisconnectedStatus() {
-//        connectionStatusButton.setText("Disconnected");
     }
 
     public void captureCardClick(View view) {

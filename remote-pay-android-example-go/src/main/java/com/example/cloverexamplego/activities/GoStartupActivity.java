@@ -30,14 +30,12 @@ import android.widget.RadioButton;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
-import com.crashlytics.android.Crashlytics;
 import com.example.cloverexamplego.R;
 import com.example.cloverexamplego.model.GoStartupParams;
 import com.example.cloverexamplego.rest.ApiClient;
 import com.example.cloverexamplego.rest.ApiInterface;
 import com.example.cloverexamplego.utils.PreferenceUtil;
 import com.example.cloverexamplego.utils.Validator;
-import io.fabric.sdk.android.Fabric;
 import okhttp3.ResponseBody;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -47,7 +45,6 @@ import retrofit2.Response;
 
 import java.io.IOException;
 
-import static com.clover.remote.client.clovergo.CloverGoDeviceConfiguration.ENV.DEMO;
 import static com.clover.remote.client.clovergo.CloverGoDeviceConfiguration.ENV.LIVE;
 import static com.clover.remote.client.clovergo.CloverGoDeviceConfiguration.ENV.SANDBOX;
 
@@ -63,19 +60,18 @@ public class GoStartupActivity extends Activity {
     private static final String PREF_QUICK_CHIP = "PREF_QUICK_CHIP";
     private static final String PREF_ENV = "PREF_ENV";
 
-    private String mBaseUrl;
-    private String mGoApiKey, mGoSecret, mDemoAccessToken;
-    private String mOAuthClientId, mOAuthClientSecret, mOAuthUrl, mOAuthTokenUrl;
-    private String mAppId, mAppVersion;
-    private CloverGoDeviceConfiguration.ENV mGoEnv;
+    private String baseUrl;
+    private String goApiKey, goSecret, demoAccessToken;
+    private String oAuthClientId, oAuthClientSecret, oAuthUrl, oAuthTokenUrl;
+    private String appId, appVersion;
+    private CloverGoDeviceConfiguration.ENV goEnv;
     private boolean quickChip;
 
-    private Toast mToast;
+    private Toast toast;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Fabric.with(this, new Crashlytics());
         setContentView(R.layout.activity_startup);
 
         TextView version = findViewById(R.id.version);
@@ -83,33 +79,29 @@ public class GoStartupActivity extends Activity {
             String versionName = "Version : " + getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
             version.setText(versionName);
         } catch (PackageManager.NameNotFoundException e) {
+            showToast("Could not get package name");
         }
 
-        RadioButton demoRBtn = findViewById(R.id.demoEnvRadioBtn);
         RadioButton sandboxRBtn = findViewById(R.id.sandboxEnvRadioBtn);
         RadioButton liveRBtn = findViewById(R.id.liveEnvRadioBtn);
 
-        demoRBtn.setOnClickListener(view -> setEnvironment(DEMO));
         sandboxRBtn.setOnClickListener(view -> setEnvironment(SANDBOX));
         liveRBtn.setOnClickListener(view -> setEnvironment(LIVE));
 
         String envPref = PreferenceUtil.getStringValue(this, PREF_ENV);
         if (LIVE.name().equalsIgnoreCase(envPref)) {
-            mGoEnv = LIVE;
+            goEnv = LIVE;
             liveRBtn.setChecked(true);
         } else if (CloverGoDeviceConfiguration.ENV.SANDBOX.name().equalsIgnoreCase(envPref)) {
-            mGoEnv = SANDBOX;
+            goEnv = SANDBOX;
             sandboxRBtn.setChecked(true);
-        } else {
-            mGoEnv = DEMO;
-            demoRBtn.setChecked(true);
         }
 
         Switch quickChipSwitch = findViewById(R.id.quickChipSwitch);
         quickChipSwitch.setOnCheckedChangeListener((compoundButton, isChecked) -> quickChip = isChecked);
         quickChipSwitch.setChecked(getSharedPreferences(EXAMPLE_APP_NAME, Context.MODE_PRIVATE).getBoolean(PREF_QUICK_CHIP, false));
 
-        findViewById(R.id.demoButton).setOnClickListener(view -> connect());
+        findViewById(R.id.launchButton).setOnClickListener(view -> connect());
         findViewById(R.id.oAuthCodeButton).setOnClickListener(view -> connectGoWithAuthMode());
         findViewById(R.id.oAuthTokenButton).setOnClickListener(view -> connectGoWithNewAuthMode());
     }
@@ -170,14 +162,19 @@ public class GoStartupActivity extends Activity {
         Intent intent = new Intent();
         intent.setClass(this, GoPOSActivity.class);
 
-        startActivityWithGo(mDemoAccessToken);
+        startActivityWithGo(demoAccessToken);
     }
 
     public void connectGoWithNewAuthMode() {
+        if (goEnv == LIVE) {
+            showToast("Do not use this on LIVE environment");
+            return;
+        }
+
         setGoParams();
 
         Intent intent = new Intent(getApplicationContext(), WebViewActivity.class);
-        intent.putExtra(WebViewActivity.EXTRA_CLOVER_GO_TOKEN_URL, mOAuthTokenUrl);
+        intent.putExtra(WebViewActivity.EXTRA_CLOVER_GO_TOKEN_URL, oAuthTokenUrl);
         startActivityForResult(intent, OAUTH_REQUEST_TOKEN);
     }
 
@@ -185,7 +182,7 @@ public class GoStartupActivity extends Activity {
         setGoParams();
 
         Intent intent = new Intent(getApplicationContext(), WebViewActivity.class);
-        intent.putExtra(WebViewActivity.EXTRA_CLOVER_GO_CODE_URL, mOAuthUrl);
+        intent.putExtra(WebViewActivity.EXTRA_CLOVER_GO_CODE_URL, oAuthUrl);
         startActivityForResult(intent, OAUTH_REQUEST_CODE);
     }
 
@@ -194,8 +191,8 @@ public class GoStartupActivity extends Activity {
         progressDialog.setTitle("Merchant account loading....");
         progressDialog.show();
 
-        ApiInterface apiInterface = ApiClient.getClient(mBaseUrl).create(ApiInterface.class);
-        Call<ResponseBody> call = apiInterface.getAccessToken(clientId, mOAuthClientSecret, code);
+        ApiInterface apiInterface = ApiClient.getClient(baseUrl).create(ApiInterface.class);
+        Call<ResponseBody> call = apiInterface.getAccessToken(clientId, oAuthClientSecret, code);
 
         call.enqueue(new Callback<ResponseBody>() {
             @Override
@@ -233,23 +230,23 @@ public class GoStartupActivity extends Activity {
     }
 
     private void setEnvironment(CloverGoDeviceConfiguration.ENV env) {
-        mGoEnv = env;
-        PreferenceUtil.saveString(this, PREF_ENV, mGoEnv.name());
+        goEnv = env;
+        PreferenceUtil.saveString(this, PREF_ENV, goEnv.name());
     }
 
     private void showToast(String message) {
-        if (mToast == null) {
-            mToast = Toast.makeText(this, "", Toast.LENGTH_SHORT);
+        if (toast == null) {
+            toast = Toast.makeText(this, "", Toast.LENGTH_SHORT);
         }
-        mToast.setText(message);
-        mToast.show();
+        toast.setText(message);
+        toast.show();
     }
 
     private void startActivityWithGo(String token) {
-        PreferenceUtil.saveString(this, PREF_ENV, mGoEnv.name());
+        PreferenceUtil.saveString(this, PREF_ENV, goEnv.name());
         getSharedPreferences(EXAMPLE_APP_NAME, Context.MODE_PRIVATE).edit().putBoolean(PREF_QUICK_CHIP, quickChip).commit();
 
-        GoStartupParams params = new GoStartupParams(token, mAppId, mAppVersion, mGoApiKey, mGoSecret, quickChip, mGoEnv);
+        GoStartupParams params = new GoStartupParams(token, appId, appVersion, goApiKey, goSecret, quickChip, goEnv);
 
         Intent intent = new Intent();
         intent.setClass(this, GoPOSActivity.class);
@@ -257,81 +254,56 @@ public class GoStartupActivity extends Activity {
         startActivity(intent);
     }
 
+    /**
+     * appId - your app's ID
+     * appId = "<put your APP ID here>";
+     * <p>
+     * appVersion - your app's version
+     * appVersion = "<put your APP VERSION here>";
+     * <p>
+     * These should be provided to you.
+     * goApiKey = "<put your key here>";
+     * goSecret = "<put your secret here>";
+     * <p>
+     * This is used for demo purposes. You can generate an access token and hardcode it here so
+     * that you can use the same access token repeatedly.
+     * demoAccessToken = "<put your token here>";
+     * <p>
+     * App ID found in developer portal app settings.
+     * oAuthClientId = "<put your Client ID here>";
+     * <p>
+     * App secret found in developer portal app settings.
+     * oAuthClientSecret = "<put your secret here>";
+     */
     private void setGoParams() {
-        /*
-         * APP_ID - your app's ID
-         * APP_VERSION - your app's version
-         */
-        mAppId = "<put your APP ID here>";
-        mAppVersion = "<put your APP VERSION here>";
+        appId = "<put your APP ID here>";
+        appVersion = "<put your APP VERSION here>";
 
-        if (mGoEnv == LIVE) {
-            /*
-             * These should be provided to you.
-             */
-            mGoApiKey = "<put your key here>";
-            mGoSecret = "<put your secret here>";
+        if (goEnv == LIVE) {
+            goApiKey = "<put your key here>";
+            goSecret = "<put your secret here>";
 
-            /*
-             * This is used for demo purposes. You can generate an access token and hardcode it here so
-             * that you can use the same access token repeatedly.
-             */
-            mDemoAccessToken = "<put your token here>";
+            demoAccessToken = "<put your token here>";
 
-            /*
-              App ID found in developer portal app settings.
-              App secret found in developer portal app settings.
-             */
-            mOAuthClientId = "<put your Client ID here>";
-            mOAuthClientSecret = "<put your secret here>";
+            oAuthClientId = "<put your Client ID here>";
+            oAuthClientSecret = "<put your secret here>";
 
-            mBaseUrl = "clover.com";
+            baseUrl = "clover.com";
 
-        } else if (mGoEnv == CloverGoDeviceConfiguration.ENV.SANDBOX) {
-            /*
-             * These should be provided to you.
-             */
-            mGoApiKey = "<put your key here>";
-            mGoSecret = "<put your secret here>";
+        } else if (goEnv == CloverGoDeviceConfiguration.ENV.SANDBOX) {
+            goApiKey = "<put your key here>";
+            goSecret = "<put your secret here>";
 
-            /*
-             * This is used for demo purposes. You can generate an access token and hardcode it here so
-             * that you can use the same access token repeatedly.
-             */
-            mDemoAccessToken = "<put your token here>";
+            demoAccessToken = "<put your token here>";
 
-            /*
-              App ID found in developer portal app settings.
-              App secret found in developer portal app settings.
-             */
-            mOAuthClientId = "<put your Client ID here>";
-            mOAuthClientSecret = "<put your secret here>";
+            oAuthClientId = "<put your Client ID here>";
+            oAuthClientSecret = "<put your secret here>";
 
-            mBaseUrl = "sandbox.dev.clover.com";
-        } else if (mGoEnv == CloverGoDeviceConfiguration.ENV.DEMO) {
-            /*
-             * These should be provided to you.
-             */
-            mGoApiKey = "<put your key here>";
-            mGoSecret = "<put your secret here>";
+            baseUrl = "sandbox.dev.clover.com";
 
-            /*
-             * This is used for demo purposes. You can generate an access token and hardcode it here so
-             * that you can use the same access token repeatedly.
-             */
-            mDemoAccessToken = "<put your token here>";
-
-            /*
-              App ID found in developer portal app settings.
-              App secret found in developer portal app settings.
-             */
-            mOAuthClientId = "<put your Client ID here>";
-            mOAuthClientSecret = "<put your secret here>";
-
-            mBaseUrl = "dev14.dev.clover.com";
         }
 
-        mOAuthUrl = "https://" + mBaseUrl + "/oauth/authorize?client_id=" + mOAuthClientId + "&response_type=code";
-        mOAuthTokenUrl = "https://" + mBaseUrl + "/oauth/authorize?client_id=" + mOAuthClientId + "&response_type=token";
+        oAuthUrl = "https://" + baseUrl + "/oauth/authorize?client_id=" + oAuthClientId + "&response_type=code";
+        oAuthTokenUrl = "https://" + baseUrl + "/oauth/authorize?client_id=" + oAuthClientId + "&response_type=token";
     }
 }
