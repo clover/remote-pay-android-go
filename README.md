@@ -7,44 +7,6 @@
 Current version: 3.3.0
 
 ## Overview
-
-This SDK allows your Android-based Point-of-Sale (POS) system to communicate with a [Clover® payment device](https://www.clover.com/pos-hardware/) and process payments. Learn more about [Clover Integrations](https://www.clover.com/integrations).
-
-The Android project includes a connector and an example POS. To work with the project effectively, you will need:
-- [Gradle](https://gradle.org) (suggested version 3.4).
-- An [Android SDK](http://developer.android.com/sdk/index.html) (17+).
-- An IDE, such as [Android Studio](http://developer.android.com/tools/studio/index.html).
-- To experience transactions end-to-end from the merchant and customer perspectives, we also recommend ordering a [Clover DevKit](http://cloverdevkit.com/collections/devkits/products/clover-mini-dev-kit).
-
-## Getting connected
-1. Download the USB Pay Display app from the Clover App Market onto your Clover DevKit. You can also use the [Secure Network Pay Display app](https://docs.clover.com/build/secure-network-pay-display/) for a local network connection with the Clover DevKit. The remaining steps assume that you are using the USB Pay Display app.
-2. Open the USB Pay Display app.
-3. Run the Clover Connector Android Example POS app on your Android POS device or emulator.
-4. The Example POS screen and device connection status should appear. If the connection was successful, the device status should be "connected." If the device remains disconnected, verify that:
-	1) You are connecting the correct cable to the correct connection point on the Clover device. (On the Clover Mini, this is the USB port with the Clover logo.) You will need to use the USB cable that came with the device.
-	2) Your Android device supports “host” mode, which is also referred to as OTG mode. This functionality is required to communicate with the Clover Mini, which will operate in “accessory” mode.
-
-## Additional resources
-
-* [Release Notes](https://github.com/clover/remote-pay-android/releases)
-* [Secure Network Pay Display](https://docs.clover.com/build/secure-network-pay-display/)
-* [Tutorial for the Android SDK](https://docs.clover.com/build/getting-started-with-cloverconnector/?sdk=android)
-* [API Documentation](https://clover.github.io/remote-pay-android/1.4.1/docs/)
-* [Clover Developer Community](https://community.clover.com/index.html)
-
-
-
-
-
-
-
-![Clover](https://camo.githubusercontent.com/6c829b55aa7851e726e5fc0fd70448a0c00427b2/68747470733a2f2f7777772e636c6f7665722e636f6d2f6173736574732f696d616765732f7075626c69632d736974652f70726573732f636c6f7665725f7072696d6172795f677261795f7267622e706e67)
-
-# Clover SDK for Android POS Integration
-## Version
-Alpha Release
-Version: 3.0.0
-## Overview
 This SDK allows your Android-based Point-of-Sale (POS) system to communicate with a Clover® payment device and process payments.
 
 It includes the SDK and an example POS. To work with the project effectively, you will need:
@@ -77,23 +39,29 @@ This section will provide some quick steps to get started with the SDK. To integ
 
 ### Initial Setup
 **1. Create Developer Account:** Go to the Clover sandbox developer portal at https://sandbox.dev.clover.com/developers/ and create a developer account.
+
 ![developer_account](/images/developer-account.png)
 
 **2. Create a new application:** Log into developer portal and create a new app - enter app name, unique package name, and check all the clover permissions your application will require to function properly.
+
 ![create_app](/images/app_create.png)
 
 **3. Application Settings/Credentials:** Once your application is created you can note down the App ID and Secret which will be required in your code for OAuth flow.
+
 ![appid_secret](/images/appid_secret.png)
 
 **4. Provide re-direct URL for your OAuth flow:** Enter the redirect URL where Clover should redirect the authorization response to in the site URL field in the Web Configuration settings. The default OAuth response should be "Code".
+
 ![app_redirect](/images/app_redirect.png)
 
 **Note:** The developer portal does not currently accept non-http(s) URL schemes. If you have a custom URL scheme for native iOS and Android applications (such as myPaymentApp://clovergoauthresponse), send an email to Clovergo-Integrations@firstdata.com with your App ID and redirect URL request.
 
 **5. Set app permissions:** Your application will require Clover permissions to work correctly. Set your permissions by going to Settings, then Required Permissions menu.
+
 ![app_permissions](/images/app_permissions.png)
 
 **6. Setup your unique application id:** Provide a unique application id for your application, you can use your package name or any identifier that uniquely identifies the transactions of your application. Set this up in the Semi-integrated App section of your application settings.
+
 ![app_remoteid](/images/app_remoteid.png)
 
 Please make sure that your application bundle id is the same as the one defined in this field.
@@ -115,20 +83,7 @@ This section describes the OAuth flow steps to get the access token required to 
 **Step 5.** Parse the response of step 4 and retreive the access token. The access token provides the Merchant and Employee context to the SDK, all transactions processed will be under this context.
 
 
-### Initial Setup
-To integrate SDK in your project, you have two options:
-#### Option 1. Clone the remote-pay-android-go repository and add a new module for your app into the project
-  - Clone remote-pay-android-go
-  - Create a new app module in the project
-  - When prompted, select Phone & Tablet Module
-  - Android Studio should automatically add your new module in the settings.gradle file. If not, add the module that you created
-  - In your module’s build.gradle file, add the following line under dependencies
-		api project(':roam')
-		implementation ("com.firstdata.clovergo:remote-pay-android-go-connector:3.3.0@aar") {
-			transitive = true
-		}
-
-#### Option 2. Clone the remote-pay-android-go repository and copy the necessary modules into your own android project
+### Initial SDK Setup
   - Create or open your own project
   - Clone remote-pay-android-go into a separate project
   - Using Finder (Finder/Explorer) copy the following folder/module into your own project
