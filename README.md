@@ -4,7 +4,7 @@
 
 ## Version
 
-Current version: 3.3.1.2
+Current version: 3.3.1.3
 
 ## Overview
 This SDK allows your Android-based Point-of-Sale (POS) system to communicate with a Clover® payment device and process payments.
@@ -115,7 +115,7 @@ This section describes the OAuth flow steps to get the access token required to 
   - In your app module’s build.gradle file, add the following line under dependencies
 ```
 		api project(':roam')
-		implementation ("com.firstdata.clovergo:remote-pay-android-go-connector:3.3.1.2@aar") {
+		implementation ("com.firstdata.clovergo:remote-pay-android-go-connector:3.3.1.3@aar") {
 			transitive = true
 		}
 ```
