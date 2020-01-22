@@ -11,7 +11,7 @@ This SDK allows your Android-based Point-of-Sale (POS) system to communicate wit
 
 It includes the SDK and an example POS. To work with the project effectively, you will need:
 * Android Studio 2.3.3 & above
-* Android OS 4.2 (API 19) and above on your device
+* Android OS 4.4.4 (API 19) and above on your device
 
 To experience transactions end-to-end from the merchant and customer perspectives, we also recommend ordering a [Clover Go DevKit](http://cloverdevkit.com/collections/devkits/products/clover-all-in-one-developer-kit)
 
