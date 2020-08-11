@@ -16,46 +16,46 @@ It includes the SDK and an example POS. To work with the project effectively, yo
 To experience transactions end-to-end from the merchant and customer perspectives, we also recommend ordering a [Clover Go DevKit](http://cloverdevkit.com/collections/devkits/products/clover-all-in-one-developer-kit).
 
 The SDK enables your custom mobile point-of-sale (POS) to accept card present, EMV compliant payment transactions.
-Clover Go supports two types of card readersa magnetic stripe, EMV chip-and-signature card reader and an all-in-one card reader that supports Swipe, EMV Dip, and NFC Contactless payments. The SDK is designed to allow merchants to take payments on iOS smartphones and tablets.
+Clover Go supports two types of card readers: a magnetic stripe + EMV chip-and-signature card reader and an all-in-one card reader that supports Swipe, EMV Dip, and NFC Contactless payments. The SDK is designed to allow merchants to take payments on Android smartphones and tablets.
 
 **Core features of the  SDK for Clover Go include:**
 1. Card Present Transactions – Transactions in which the merchant uses the approved card reader to accept physical credit or debit cards on a connected smartphone or tablet. The Clover Go platform supports the following payment options:
    * **Magnetic Stripe Card** – A traditional payment card that has a magnetic stripe.
    * **EMV Card** – A payment card containing a computer chip that enhances data security. Clover Go's EMV compliant platform enables the customer or merchant to insert an EMV card into the card reader.
-   * **NFC Contactless Payment** – A transaction in which a customer leverages an Apple Pay, Samsung Pay, or Android Pay mobile wallets by tapping their mobile device to the card readerNFC Contactless Payment – A transaction in which a customer leverages an Apple Pay, Samsung Pay, or Android Pay mobile wallets by tapping their mobile device to the card reader.
+   * **NFC Contactless Payment** – A transaction in which a customer leverages an Apple Pay, Samsung Pay, or Android Pay mobile wallet by tapping their mobile device to the card reader. 
 
 **The Clover Go SDK currently supports the following payment transactions:**
-* **Sale** - A transaction used to authorize and capture the payment amount in at the same time. A Sale transaction is final and the amount cannot be adjusted.
+* **Sale** - A transaction used to both authorize and capture the payment amount at the same time. A Sale transaction is final and the amount cannot be adjusted.
 * **Auth** - A transaction that can be tip-adjusted until it is finalized during a batch closeout. This is a standard model for a restaurant that adjusts the amount to include a tip after a card is charged.
 * **Void** - A transaction that cancels or fully reverses a payment transaction.
 * **Refund** - A transaction that credits funds to the account holder.
 * **PreAuth** - A pre-authorization for a certain amount.
-* **PreAuth Capture** - A Pre-Auth that has been finalized in order to complete a payment (i.e., a bar tab that has been closed out).
+* **PreAuth Capture** - A Pre-Auth that has been finalized in order to complete a payment (i.e. a bar tab that has been closed out).
 * **Partial Auth** - A partial authorization. The payment gateway may return a partial authorization if the transaction amount exceeds the customer’s credit or debit card limit.
-* **Tip Adjust** - A transaction in which a merchant takes or edits a tip after the customer’s card has been processed (i.e., after the initial Auth transaction).
+* **Tip Adjust** - A transaction in which a merchant takes or edits a tip after the customer’s card has been processed (i.e. after the initial Auth transaction).
 
 # Getting Started
 
 This section will provide both high-level and detailed steps in getting started with the SDK.
 
 ## High-Level View of the Integration Process
-1. Create a sandbox developer account to test the sample app included with the SDK.
+1. Create a [sandbox developer account](https://sandbox.dev.clover.com/developer-home/create-account) to test the [sample app](https://github.com/clover/remote-pay-android-go/tree/master/remote-pay-android-example-go) included with the SDK.
 
-    **Note**: You’ll need to request for a sandbox API key and secret to process transactions with your Go Devkit. You can request these values from the DevRel team via dev@clover.com.
+    **Note**: You’ll need to request a sandbox API key and secret to process transactions with your Go Devkit. You can request these values from the DevRel team via dev@clover.com.
 
 2. Apply the same steps you’ve learned from testing the sample app to test your own app.
 
    **Note**: You can use the same Sandbox API key and secret from step 1.
 
 3. Once your app is ready to be released to production, your app will need to go through Clover Go’s QA review.
-4. When your sandbox app is approved by the Clover Go Q&A team, you will need to create a new prod developer account and register your application.
-5. Your prod account and prod app then goes through the Clover Go App Approval process. This is a relatively quick process where the DevRel team does the following:
+4. When your sandbox app is approved by the DevRel team, you will need to create a new prod developer account and register your application.
+5. Your prod account and prod app then goes through the DevRel [App Approval process](https://docs.clover.com/docs/developer-app-approval). This is a relatively quick process where the DevRel team does the following:
 
    - Reviews and verifies the information submitted for your developer profile.
    - Ensures that your app’s Requested Permissions do not include Customer Read, Write permissions and Employee Write permissions, but includes everything else.
    - Ensures that your app is not published.
 
-6. Once you have successfully completed the Clover Go App Approval process, you can now request for a production API key and secret from the DevRel team to make live transactions!
+6. Once you have successfully completed the DevRel App Approval process, you can now request for a production API key and secret from the DevRel team to make live transactions!
 
 
 ## Tips on Integrating with the Sample App
@@ -87,7 +87,7 @@ The access token is generated for a specific merchant employee in order to provi
 4. Edit your app’s REST Configuration. The Site URL should be your app’s URL. But if you don’t have one set up yet, you can just use `https://sandbox.dev.clover.com` for now. Make sure the Default OAuth Response is **CODE**.
 ![oauth4](/images/oauth4.png)
 
-   **Note**: The developer portal does not currently accept non-http(s) URL schemes. If you have a custom URL scheme for native iOS and Android applications (such as myPaymentApp://clovergoauthresponse), send an email to `Clovergo-Integrations@firstdata.com` with your App ID and redirect URL request.
+   **Note**: The developer portal does not currently accept non-http(s) URL schemes. If you have a custom URL scheme for native iOS and Android applications (such as myPaymentApp://clovergoauthresponse), send an email to `dev@clover.com` with your App ID and redirect URL request.
 
 5. Click the **Market Listing** tab and then on **Preview in App Market**.
 ![oauth5a](/images/oauth5a.png)
@@ -161,7 +161,7 @@ The access token is generated for a specific merchant employee in order to provi
 
 #### Important sample code to review:
   - Once you have your app module created, you can look at the remote-pay-android-example-pos activities, such as StartupActivity and ExamplePOSActivity to see how the Clover and/or Clover Go connectors are created and implemented.  The ExamplePOSActivity also has the listener implementations that you can reference.
-    - Note: The CloverConnector is for use with Clover Mini POS stations.  CloverGoConnector is for use with standard Android phones and tablets using Clover's Audio Jack (RP350) and Bluetooth (RP450) card readers.
+    - Note: The CloverConnector is for use with the Clover Mini, Flex, and Station.  CloverGoConnector is for use with standard Android phones and tablets using Clover's Audio Jack (RP350) and Bluetooth (RP450) card readers.
 
   - The remote-pay-android-connector module contains the connector implementations for both Clover (CloverConnector) and Clover Go (CloverGoConnector)
 
