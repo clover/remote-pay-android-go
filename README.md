@@ -1,4 +1,4 @@
-![alt text](https://www.clover.com/assets/images/public-site/press/clover_primary_gray_rgb.png)
+![alt text](https://www.clover.com/static/media/clover-logo.4204a79c.svg)
 
 # Clover SDK for Android POS integration
 
