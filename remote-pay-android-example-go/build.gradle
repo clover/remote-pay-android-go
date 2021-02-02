@@ -13,13 +13,13 @@ repositories {
 }
 
 android {
-  compileSdkVersion 27
-  buildToolsVersion '27.0.3'
+  compileSdkVersion 30
+  buildToolsVersion '30.0.2'
 
   defaultConfig {
     applicationId "com.example.cloverexamplego"
     minSdkVersion 19
-    targetSdkVersion 19
+    targetSdkVersion 30
     versionCode 3
     versionName "3.3.1"
 

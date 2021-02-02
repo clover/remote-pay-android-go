@@ -60,7 +60,7 @@ public class GoStartupActivity extends Activity {
     private static final String PREF_QUICK_CHIP = "PREF_QUICK_CHIP";
     private static final String PREF_ENV = "PREF_ENV";
 
-    private String baseUrl;
+    private String baseUrl = "sandbox.dev.clover.com";
     private String goApiKey, goSecret, demoAccessToken;
     private String oAuthClientId, oAuthClientSecret, oAuthUrl, oAuthTokenUrl;
     private String appId, appVersion;
