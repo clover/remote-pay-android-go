@@ -25,7 +25,7 @@ public class KeyedTransactionDialog extends BaseDialog {
     public static final String TAG = "KeyedTransactionDialog";
 
     private final String CARD_NUM = "4111111111111111";
-    private final String CARD_EXP = "1220";
+    private final String CARD_EXP = "1224";
     private final String CARD_CVV = "333";
 
     private ICloverGoConnectorListener.ManualCardEntry mManualCardEntryListnr;

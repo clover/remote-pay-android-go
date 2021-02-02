@@ -64,7 +64,7 @@ public class GoStartupActivity extends Activity {
     private String goApiKey, goSecret, demoAccessToken;
     private String oAuthClientId, oAuthClientSecret, oAuthUrl, oAuthTokenUrl;
     private String appId, appVersion;
-    private CloverGoDeviceConfiguration.ENV goEnv;
+    private CloverGoDeviceConfiguration.ENV goEnv = SANDBOX;
     private boolean quickChip;
 
     private Toast toast;
