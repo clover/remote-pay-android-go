@@ -16,8 +16,6 @@
 
 package com.example.cloverexamplego.activities;
 
-import com.clover.remote.client.clovergo.CloverGoDeviceConfiguration;
-
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -26,24 +24,29 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.clover.remote.client.clovergo.CloverGoDeviceConfiguration;
 import com.example.cloverexamplego.R;
 import com.example.cloverexamplego.model.GoStartupParams;
 import com.example.cloverexamplego.rest.ApiClient;
 import com.example.cloverexamplego.rest.ApiInterface;
 import com.example.cloverexamplego.utils.PreferenceUtil;
 import com.example.cloverexamplego.utils.Validator;
-import okhttp3.ResponseBody;
+
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.IOException;
+
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-
-import java.io.IOException;
 
 import static com.clover.remote.client.clovergo.CloverGoDeviceConfiguration.ENV.LIVE;
 import static com.clover.remote.client.clovergo.CloverGoDeviceConfiguration.ENV.SANDBOX;
@@ -63,11 +66,13 @@ public class GoStartupActivity extends Activity {
     private String baseUrl = "sandbox.dev.clover.com";
     private String goApiKey, goSecret, demoAccessToken;
     private String oAuthClientId, oAuthClientSecret, oAuthUrl, oAuthTokenUrl;
+    private String oAuthScheme, oAuthHost;
     private String appId, appVersion;
     private CloverGoDeviceConfiguration.ENV goEnv = SANDBOX;
     private boolean quickChip;
 
     private Toast toast;
+    private EditText schemeEdtTxt, hostEdtTxt;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,6 +109,9 @@ public class GoStartupActivity extends Activity {
         findViewById(R.id.launchButton).setOnClickListener(view -> connect());
         findViewById(R.id.oAuthCodeButton).setOnClickListener(view -> connectGoWithAuthMode());
         findViewById(R.id.oAuthTokenButton).setOnClickListener(view -> connectGoWithNewAuthMode());
+
+        schemeEdtTxt = findViewById(R.id.webScheme);
+        hostEdtTxt = findViewById(R.id.webHost);
     }
 
     @Override
@@ -303,7 +311,10 @@ public class GoStartupActivity extends Activity {
 
         }
 
+        oAuthScheme = schemeEdtTxt.getText().toString();
+        oAuthHost = hostEdtTxt.getText().toString();
+
         oAuthUrl = "https://" + baseUrl + "/oauth/authorize?client_id=" + oAuthClientId + "&response_type=code";
-        oAuthTokenUrl = "https://" + baseUrl + "/oauth/authorize?client_id=" + oAuthClientId + "&response_type=token";
+        oAuthTokenUrl = "https://" + baseUrl + "/oauth/authorize?client_id=" + oAuthClientId + "&response_type=token" + "&redirect_uri=" + oAuthScheme + "://" + oAuthHost;
     }
 }

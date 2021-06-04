@@ -1,5 +1,26 @@
 package com.example.cloverexamplego.activities;
 
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.ProgressDialog;
+import android.bluetooth.BluetoothAdapter;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.location.LocationManager;
+import android.os.Bundle;
+import android.os.SystemClock;
+import android.text.TextUtils;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
+
 import com.clover.remote.CardData;
 import com.clover.remote.Challenge;
 import com.clover.remote.client.ConnectorFactory;
@@ -22,6 +43,7 @@ import com.clover.remote.client.messages.CloverDeviceEvent;
 import com.clover.remote.client.messages.ConfirmPaymentRequest;
 import com.clover.remote.client.messages.GoCardData;
 import com.clover.remote.client.messages.ManualRefundResponse;
+import com.clover.remote.client.messages.PaymentResponse;
 import com.clover.remote.client.messages.PreAuthResponse;
 import com.clover.remote.client.messages.ReadCardDataRequest;
 import com.clover.remote.client.messages.ReadCardDataResponse;
@@ -36,27 +58,6 @@ import com.clover.remote.client.messages.VoidPaymentResponse;
 import com.clover.remote.message.TipAddedMessage;
 import com.clover.sdk.v3.payments.Credit;
 import com.clover.sdk.v3.payments.Payment;
-
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.Dialog;
-import android.app.ProgressDialog;
-import android.bluetooth.BluetoothAdapter;
-import android.content.Context;
-import android.content.Intent;
-import android.location.LocationManager;
-import android.os.Bundle;
-import android.os.SystemClock;
-import android.support.design.widget.BottomNavigationView;
-import android.text.TextUtils;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.Toast;
 import com.example.cloverexamplego.R;
 import com.example.cloverexamplego.dialogs.KeyedTransactionDialog;
 import com.example.cloverexamplego.dialogs.PaymentTypeDialog;
@@ -81,12 +82,14 @@ import com.example.cloverexamplego.utils.DialogHelper;
 import com.example.cloverexamplego.utils.PreferenceUtil;
 import com.firstdata.clovergo.domain.model.Order;
 import com.firstdata.clovergo.domain.model.ReaderInfo;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
+import static com.clover.remote.client.Constants.CARD_TRANSACTION_EXTRA_APPLICATION_IDENTIFIER;
 import static com.firstdata.clovergo.domain.model.ReaderInfo.ReaderType.RP350;
 import static com.firstdata.clovergo.domain.model.ReaderInfo.ReaderType.RP450;
 
@@ -95,60 +98,41 @@ public class GoPOSActivity extends Activity {
     public static final String EXTRA_GO_PARAMS = "EXTRA_GO_PARAMS";
     private static final String TAG = GoPOSActivity.class.getSimpleName();
 
-    private String mPreferred450Reader;
-    private int mCardEntryMethodState;
-    private Toast mToast;
-    private boolean isReadCardDemo = false;
-
-    private ArrayList<ReaderInfo> mArrayListReadersList;
-    private ArrayList<String> mArrayListReaderString;
-    private ArrayAdapter<String> mReaderArrayAdapter;
-    private HashMap<ReaderInfo.ReaderType, CloverGoConnector> cloverGoConnectorMap;
+    private HashMap<ReaderInfo.ReaderType, CloverGoConnector> cGoConnectorMap;
     private HashMap<ReaderInfo.ReaderType, MerchantInfo> merchantInfoMap;
-    private HashMap<String, GoOrder> mProcessedOrdersMap;
-    private HashMap<String, GoPayment> mProcessedPaymentsMap;
-    private ArrayList<GoOrder> mProcessedOrders;
-    private ArrayList<GoPayment> mPreAuthPayments;
+    private HashMap<String, GoOrder> processedOrdersMap;
+    private HashMap<String, GoPayment> processedPaymentsMap;
+    private ArrayList<ReaderInfo> arrayListReadersList;
+    private ArrayList<String> arrayListReaderString;
+    private ArrayList<GoOrder> processedOrders;
+    private ArrayList<GoPayment> preAuthPayments;
     private ArrayList<GoNakedRefund> goNakedRefunds;
     private ArrayList<GoCard> goCards;
+    private ArrayAdapter<String> readerArrayAdapter;
 
-    private AlertDialog pairingCodeDialog;
     private ProgressDialog progressDialog;
     private Dialog alertDialog;
-    private BottomNavigationView mBottomNavigationView;
+    private Dialog confirmDialog;
     private Dialog readerListDialog;
-    private TextView mMerchantInfoTxtVw;
+    private BottomNavigationView navigationView;
+    private Toast toast;
+    private TextView merchantInfoTxtVw;
 
     private Payment currentPayment = null;
     private Challenge[] currentChallenges = null;
     private ReaderInfo.ReaderType goReaderType = RP450;
-    private GoStartupParams mStartupParams;
+    private GoStartupParams startupParams;
+    private MerchantInfo merchantInfo;
 
     private ICloverConnector cloverConnector;
     private ICloverGoConnectorListener ccGoListener;
     private ICloverGoConnectorListener.PaymentTypeSelection paymentTypeSelection;
+    private PaymentConfirmationListener payConfListener;
+    private BottomNavigationView.OnNavigationItemSelectedListener navigationListener;
 
-    private PaymentConfirmationListener mPayConfListener;
-    private BottomNavigationView.OnNavigationItemSelectedListener bottomNavigationListener = item -> {
-        switch (item.getItemId()) {
-            case R.id.action_register:
-                showRegister();
-                break;
-            case R.id.action_orders:
-                showOrders();
-                break;
-            case R.id.action_misc:
-                showMisc();
-                break;
-            case R.id.action_manual_refund:
-                showManualRefunds();
-                break;
-            case R.id.action_vault_card:
-                showVaultCards();
-                break;
-        }
-        return true;
-    };
+    private String preferred450Reader;
+    private int cardEntryMethodState;
+    private boolean isReadCardDemo = false;
 
 
     @Override
@@ -158,28 +142,29 @@ public class GoPOSActivity extends Activity {
 
         PreferenceUtil.saveString(this, "Device_ID", "");
 
-        mProcessedOrdersMap = new HashMap<>();
-        mProcessedPaymentsMap = new HashMap<>();
-        cloverGoConnectorMap = new HashMap<>();
+        processedOrdersMap = new HashMap<>();
+        processedPaymentsMap = new HashMap<>();
+        cGoConnectorMap = new HashMap<>();
         merchantInfoMap = new HashMap<>();
 
-        mPreAuthPayments = new ArrayList<>();
-        mProcessedOrders = new ArrayList<>();
-        mPreAuthPayments = new ArrayList<>();
+        preAuthPayments = new ArrayList<>();
+        processedOrders = new ArrayList<>();
+        preAuthPayments = new ArrayList<>();
         goNakedRefunds = new ArrayList<>();
         goCards = new ArrayList<>();
-        mStartupParams = (GoStartupParams) getIntent().getSerializableExtra(EXTRA_GO_PARAMS);
+        startupParams = (GoStartupParams) getIntent().getSerializableExtra(EXTRA_GO_PARAMS);
 
-        isReadCardDemo = mStartupParams.getAccessToken().equals("readCard");
+        isReadCardDemo = startupParams.getAccessToken().equals("readCard");
 
-        mCardEntryMethodState = getDefaultCloverGoCardEntryMethods();
+        cardEntryMethodState = getDefaultCloverGoCardEntryMethods();
 
-        mMerchantInfoTxtVw = findViewById(R.id.merchantInfoTxtVw);
+        merchantInfoTxtVw = findViewById(R.id.merchantInfoTxtVw);
 
-        mBottomNavigationView = findViewById(R.id.bottom_navigation);
-        mPayConfListener = new PaymentConfirmationListener() {
+        navigationView = findViewById(R.id.bottom_navigation);
+        payConfListener = new PaymentConfirmationListener() {
             @Override
-            public void onRejectClicked(Challenge challenge) { // Reject payment and send the challenge along for logging/reason
+            public void onRejectClicked(Challenge challenge) {
+                // Reject payment and send the challenge along for logging/reason
                 getCloverConnector().rejectPayment(currentPayment, challenge);
                 currentChallenges = null;
                 currentPayment = null;
@@ -187,7 +172,8 @@ public class GoPOSActivity extends Activity {
 
             @Override
             public void onAcceptClicked(final int challengeIndex) {
-                if (challengeIndex == currentChallenges.length - 1) { // no more challenges, so accept the payment
+                if (challengeIndex == currentChallenges.length - 1) {
+                    // no more challenges, so accept the payment
                     getCloverConnector().acceptPayment(currentPayment);
                     currentChallenges = null;
                     currentPayment = null;
@@ -197,15 +183,15 @@ public class GoPOSActivity extends Activity {
 
                     switch (theChallenge.type) {
                         case DUPLICATE_CHALLENGE:
-                            showPaymentConfirmation(mPayConfListener, theChallenge, challengeIndex + 1);
+                            showPaymentConfirmation(payConfListener, theChallenge, challengeIndex + 1);
                             break;
 
                         case PARTIAL_AUTH_CHALLENGE:
-                            showPartialAuthChallenge(mPayConfListener, theChallenge, challengeIndex + 1);
+                            showPartialAuthChallenge(payConfListener, theChallenge, challengeIndex + 1);
                             break;
 
                         case OFFLINE_CHALLENGE:
-                            showOfflineChallenge(mPayConfListener, theChallenge, challengeIndex + 1);
+                            showOfflineChallenge(payConfListener, theChallenge, challengeIndex + 1);
                             break;
                     }
                 }
@@ -214,19 +200,19 @@ public class GoPOSActivity extends Activity {
 
         initCGoConnectorListener();
         initializeReader(RP450);
-        cloverConnector = cloverGoConnectorMap.get(RP450);
+        cloverConnector = cGoConnectorMap.get(RP450);
 
         if (isReadCardDemo) {
-            mBottomNavigationView.setOnNavigationItemSelectedListener(item -> {
+            navigationView.setOnNavigationItemSelectedListener(item -> {
                 if (item.getItemId() == R.id.action_misc) {
                     showMiscReadCard(true);
                 }
                 return true;
             });
-            mBottomNavigationView.setSelectedItemId(R.id.action_misc);
+            navigationView.setSelectedItemId(R.id.action_misc);
         } else {
-            mBottomNavigationView.setOnNavigationItemSelectedListener(bottomNavigationListener);
-            mBottomNavigationView.setSelectedItemId(R.id.action_register);
+            navigationView.setOnNavigationItemSelectedListener(getNavigationListener());
+            navigationView.setSelectedItemId(R.id.action_register);
         }
     }
 
@@ -238,16 +224,13 @@ public class GoPOSActivity extends Activity {
 
     @Override
     public void onBackPressed() {
-        AlertDialog.Builder confirmationDialog = new AlertDialog.Builder(this);
-        confirmationDialog.setTitle("Exit");
-        confirmationDialog.setMessage("Are you sure you want to close the app?");
-        confirmationDialog.setCancelable(false);
-        confirmationDialog.setNegativeButton("No", (dialog, which) -> dialog.dismiss());
-        confirmationDialog.setPositiveButton("Yes", (dialog, which) -> {
-            dialog.dismiss();
-            GoPOSActivity.this.finish();
-        });
-        confirmationDialog.show();
+        showConfirmDialog("Exit", "Are you sure you want to close the app?", "Yes", "No",
+                (dialog, which) -> {
+                    dialog.dismiss();
+                    GoPOSActivity.this.finish();
+                },
+                (dialog, which) -> dialog.dismiss()
+        );
     }
 
     private void initializeReader(ReaderInfo.ReaderType readerType) {
@@ -257,12 +240,14 @@ public class GoPOSActivity extends Activity {
             // Need paymentType in addition to goReaderType in case key entered is selected.
             createCloverGoConnector(readerType);
 
-            if (merchantInfo != null) {
+            if (merchantInfo == null) {
+                setDisconnectedStatus();
+            } else {
                 setConnectedStatus(merchantInfo);
             }
         }
 
-        cloverGoConnectorMap = ConnectorFactory.getCloverGoConnectorMap();
+        cGoConnectorMap = ConnectorFactory.getCloverGoConnectorMap();
     }
 
     public void initCGoConnectorListener() {
@@ -278,7 +263,7 @@ public class GoPOSActivity extends Activity {
 
             @Override
             public void onSendReceipt(Order order, SendReceipt sendReceipt) {
-                dismissDialog();
+                dismissDialogs();
                 showToast("Transaction Complete");
 
                 SendReceiptFragment sendReceiptFragment = SendReceiptFragment.newInstance(order.getId(), sendReceipt);
@@ -292,7 +277,7 @@ public class GoPOSActivity extends Activity {
 
             @Override
             public void onSignatureRequired(com.firstdata.clovergo.domain.model.Payment payment, SignatureCapture signatureCapture) {
-                dismissDialog();
+                dismissDialogs();
 
                 SignatureFragment signatureFragment = SignatureFragment.newInstance(payment.getPaymentId(), signatureCapture);
                 showFragment(signatureFragment);
@@ -303,6 +288,10 @@ public class GoPOSActivity extends Activity {
                 merchantInfoMap.put(readerInfo.getReaderType(), null);
                 showToast("Disconnected");
                 Log.d(TAG, "disconnected");
+
+                if (goReaderType == readerInfo.getReaderType()) {
+                    setDisconnectedStatus();
+                }
             }
 
             public void onDeviceConnected() {
@@ -354,27 +343,25 @@ public class GoPOSActivity extends Activity {
             }
 
             @Override
-            public void onGetMerchantInfoResponse(MerchantInfo merchantInfo) {
-                if (merchantInfo != null) {
-                    dismissDialog();
-                    mMerchantInfoTxtVw.setText("Merchant: " + merchantInfo.getMerchantName());
+            public void onGetMerchantInfoResponse(MerchantInfo merchant) {
+                if (merchant != null) {
+                    dismissDialogs();
+                    merchantInfo = merchant;
+                    merchantInfoTxtVw.setText("Merchant: " + merchantInfo.getMerchantName());
 
                 } else {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(GoPOSActivity.this);
-                    builder.setMessage("Could not initialize the SDK. Please try again later.")
-                            .setTitle("Initialization error")
-                            .setPositiveButton(getString(android.R.string.ok), (dialog, which) -> {
+                    showAlertDialog("Initialization error", "Could not initialize the SDK. Please try again later.",
+                            (dialog, which) -> {
                                 GoPOSActivity.this.finish();
                                 startActivity(new Intent(GoPOSActivity.this, GoStartupActivity.class));
-                            }).show();
-
+                            });
                 }
             }
 
             @Override
             public void onDeviceDiscovered(ReaderInfo readerInfo) {
                 boolean isSelected = false;
-                for (ReaderInfo readerInfoItem : mArrayListReadersList) {
+                for (ReaderInfo readerInfoItem : arrayListReadersList) {
                     if (readerInfoItem.getBluetoothIdentifier().contentEquals(readerInfo.getBluetoothIdentifier())) {
                         isSelected = true;
                         break;
@@ -382,18 +369,18 @@ public class GoPOSActivity extends Activity {
                 }
 
                 if (!isSelected) {
-                    if (!TextUtils.isEmpty(mPreferred450Reader) && readerInfo.getBluetoothName().contains(mPreferred450Reader)) {
+                    if (!TextUtils.isEmpty(preferred450Reader) && readerInfo.getBluetoothName().contains(preferred450Reader)) {
                         ((ICloverGoConnector) cloverConnector).connectToBluetoothDevice(readerInfo);
                         showToast("Auto-connecting to preferred reader");
                         readerListDialog.dismiss();
                         return;
                     }
 
-                    mArrayListReadersList.add(readerInfo);
-                    mArrayListReaderString.add(readerInfo.getBluetoothName());
+                    arrayListReadersList.add(readerInfo);
+                    arrayListReaderString.add(readerInfo.getBluetoothName());
 
-                    if (mReaderArrayAdapter != null) {
-                        mReaderArrayAdapter.notifyDataSetChanged();
+                    if (readerArrayAdapter != null) {
+                        readerArrayAdapter.notifyDataSetChanged();
                     }
                 }
             }
@@ -413,7 +400,7 @@ public class GoPOSActivity extends Activity {
                             aidSelection.selectApplicationIdentifier(applicationIdentifiers.get(i));
                         })
                         .setNegativeButton("Cancel", (dialogInterface, i) -> {
-                            dismissDialog();
+                            dismissDialogs();
                             dialogInterface.cancel();
                             showToast("Transaction cancelled Card is not charged");
                         })
@@ -445,11 +432,11 @@ public class GoPOSActivity extends Activity {
                     // Checking if connected again here in case it disconnected on the way to this logic
                     if (connectedReader.isConnected()) {
                         if (connectedReader.getReaderType() == RP350 &&
-                            ((cardEntryMethods & Constants.CARD_ENTRY_METHOD_ICC_CONTACT) == Constants.CARD_ENTRY_METHOD_ICC_CONTACT)) {
+                                ((cardEntryMethods & Constants.CARD_ENTRY_METHOD_ICC_CONTACT) == Constants.CARD_ENTRY_METHOD_ICC_CONTACT)) {
                             show350 = true;
 
                         } else if (connectedReader.getReaderType() == RP450 &&
-                                   ((cardEntryMethods & Constants.CARD_ENTRY_METHOD_NFC_CONTACTLESS) == Constants.CARD_ENTRY_METHOD_NFC_CONTACTLESS)) {
+                                ((cardEntryMethods & Constants.CARD_ENTRY_METHOD_NFC_CONTACTLESS) == Constants.CARD_ENTRY_METHOD_NFC_CONTACTLESS)) {
                             show450 = true;
 
                         }
@@ -461,7 +448,7 @@ public class GoPOSActivity extends Activity {
             }
 
             public void onDeviceReady(final MerchantInfo merchantInfo) {
-                dismissDialog();
+                dismissDialogs();
 
                 if (merchantInfo != null) {
                     if (goReaderType.name().equalsIgnoreCase(merchantInfo.getDeviceInfo().getModel())) {
@@ -475,12 +462,7 @@ public class GoPOSActivity extends Activity {
                     }
                 }
 
-                if (pairingCodeDialog != null && pairingCodeDialog.isShowing()) {
-                    pairingCodeDialog.dismiss();
-                    pairingCodeDialog = null;
-                }
-
-                showToast("Ready!");
+                showToast("Device Ready!");
             }
 
             @Override
@@ -524,14 +506,13 @@ public class GoPOSActivity extends Activity {
 
             @Override
             public void onSaleResponse(final SaleResponse response) {
-                dismissDialog();
+                dismissDialogs();
 
                 if (response.isSuccess()) {
-                    Payment payment = response.getPayment();
                     addNewProcessedOrder(new GoOrder(new GoPayment(response)));
 
                     showRegister();
-                    showPaymentInfo(payment);
+                    showPaymentInfo(response);
                     showToast("Sale successfully processed");
                 } else {
                     showAlertDialog(response.getReason(), response.getMessage());
@@ -540,14 +521,13 @@ public class GoPOSActivity extends Activity {
 
             @Override
             public void onAuthResponse(final AuthResponse response) {
-                dismissDialog();
+                dismissDialogs();
 
                 if (response.isSuccess()) {
-                    Payment payment = response.getPayment();
                     addNewProcessedOrder(new GoOrder(new GoPayment(response)));
 
                     showRegister();
-                    showPaymentInfo(payment);
+                    showPaymentInfo(response);
                     showToast("Auth successfully processed.");
 
                 } else {
@@ -558,15 +538,14 @@ public class GoPOSActivity extends Activity {
 
             @Override
             public void onPreAuthResponse(final PreAuthResponse response) {
-                dismissDialog();
+                dismissDialogs();
 
                 if (response.isSuccess()) {
-                    Payment payment = response.getPayment();
-                    mPreAuthPayments.add(new GoPayment(response));
+                    preAuthPayments.add(new GoPayment(response));
 
-                    showRegister(mPreAuthPayments);
+                    showRegister(preAuthPayments);
+                    showPaymentInfo(response);
                     showToast("PreAuth successfully processed.");
-                    showPaymentInfo(payment);
 
                 } else {
                     showAlertDialog(response.getReason(), response.getMessage());
@@ -576,13 +555,13 @@ public class GoPOSActivity extends Activity {
 
             @Override
             public void onTipAdjustAuthResponse(TipAdjustAuthResponse response) {
-                dismissDialog();
+                dismissDialogs();
 
                 if (response.isSuccess()) {
-                    GoOrder goOrder = mProcessedOrdersMap.get(response.getPaymentId());
+                    GoOrder goOrder = processedOrdersMap.get(response.getPaymentId());
 
                     if (goOrder != null) {
-                        mProcessedPaymentsMap.get(response.getPaymentId())
+                        processedPaymentsMap.get(response.getPaymentId())
                                 .setTipAmount(response.getTipAmount());
                         showToast("Tip successfully adjusted");
                     }
@@ -593,19 +572,22 @@ public class GoPOSActivity extends Activity {
 
             @Override
             public void onCapturePreAuthResponse(CapturePreAuthResponse response) {
-                dismissDialog();
+                dismissDialogs();
 
                 if (response.isSuccess()) {
-                    for (GoPayment goPayment : mPreAuthPayments) {
+                    for (GoPayment goPayment : preAuthPayments) {
                         if (goPayment.getPayment().getId().equals(response.getPaymentID())) {
-                            mPreAuthPayments.remove(goPayment);
+                            preAuthPayments.remove(goPayment);
                             goPayment.getPayment().setAmount(response.getAmount());
                             goPayment.setStatus(GoPayment.Status.AUTHORIZED);
                             addNewProcessedOrder(new GoOrder(goPayment));
 
                             showToast("PreAuth successfully processed.");
-                            showFragment(RegisterFragment.newInstance(cloverConnector, mPreAuthPayments));
-                            showPaymentInfo(goPayment.getPayment());
+                            showFragment(RegisterFragment.newInstance(cloverConnector, preAuthPayments));
+
+                            PaymentResponse paymentResponse = new PaymentResponse(true, ResultCode.SUCCESS);
+                            paymentResponse.setPayment(goPayment.getPayment());
+                            showPaymentInfo(paymentResponse);
                             break;
                         }
                     }
@@ -625,13 +607,13 @@ public class GoPOSActivity extends Activity {
 
                     switch (theChallenge.type) {
                         case DUPLICATE_CHALLENGE:
-                            showPaymentConfirmation(mPayConfListener, theChallenge, 0);
+                            showPaymentConfirmation(payConfListener, theChallenge, 0);
                             break;
                         case PARTIAL_AUTH_CHALLENGE:
-                            showPartialAuthChallenge(mPayConfListener, theChallenge, 0);
+                            showPartialAuthChallenge(payConfListener, theChallenge, 0);
                             break;
                         case OFFLINE_CHALLENGE:
-                            showOfflineChallenge(mPayConfListener, theChallenge, 0);
+                            showOfflineChallenge(payConfListener, theChallenge, 0);
                             break;
                     }
                 }
@@ -648,12 +630,12 @@ public class GoPOSActivity extends Activity {
 
             @Override
             public void onRefundPaymentResponse(final RefundPaymentResponse response) {
-                dismissDialog();
+                dismissDialogs();
 
                 if (response.isSuccess()) {
                     GoRefund refund = new GoRefund(response.getRefund());
-                    mProcessedPaymentsMap.get(response.getPaymentId()).setStatus(GoPayment.Status.REFUNDED);
-                    mProcessedOrdersMap.get(response.getPaymentId()).addRefund(refund);
+                    processedPaymentsMap.get(response.getPaymentId()).setStatus(GoPayment.Status.REFUNDED);
+                    processedOrdersMap.get(response.getPaymentId()).addRefund(refund);
                     showToast("Payment successfully refunded");
 
                 } else {
@@ -671,11 +653,11 @@ public class GoPOSActivity extends Activity {
 
             @Override
             public void onVoidPaymentResponse(VoidPaymentResponse response) {
-                dismissDialog();
+                dismissDialogs();
 
                 if (response.isSuccess()) {
-                    if (mProcessedPaymentsMap.get(response.getPaymentId()) != null) {
-                        mProcessedPaymentsMap.get(response.getPaymentId()).setStatus(GoPayment.Status.VOIDED);
+                    if (processedPaymentsMap.get(response.getPaymentId()) != null) {
+                        processedPaymentsMap.get(response.getPaymentId()).setStatus(GoPayment.Status.VOIDED);
                     }
 
                     showToast("Payment successfully voided");
@@ -688,7 +670,7 @@ public class GoPOSActivity extends Activity {
 
             @Override
             public void onManualRefundResponse(final ManualRefundResponse response) {
-                dismissDialog();
+                dismissDialogs();
                 if (response.isSuccess()) {
                     Credit credit = response.getCredit();
                     final GoNakedRefund nakedRefund = new GoNakedRefund(null, credit.getAmount());
@@ -704,7 +686,7 @@ public class GoPOSActivity extends Activity {
 
             @Override
             public void onReadCardDataResponse(final ReadCardDataResponse response) {
-                dismissDialog();
+                dismissDialogs();
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -725,8 +707,8 @@ public class GoPOSActivity extends Activity {
                                         this.text2 = value;
                                     }
 
-                                    String text1;
-                                    String text2;
+                                    final String text1;
+                                    final String text2;
                                 }
 
                                 ArrayAdapter<RowData> data = new ArrayAdapter<RowData>(getBaseContext(), android.R.layout.simple_list_item_2) {
@@ -823,7 +805,7 @@ public class GoPOSActivity extends Activity {
 
             @Override
             public void onVaultCardResponse(final VaultCardResponse response) {
-                dismissDialog();
+                dismissDialogs();
 
                 if (response.isSuccess()) {
                     GoCard card = new GoCard();
@@ -852,7 +834,7 @@ public class GoPOSActivity extends Activity {
 
             @Override
             public void onRetrievePaymentResponse(RetrievePaymentResponse response) {
-                dismissDialog();
+                dismissDialogs();
                 if (response.isSuccess()) {
                     showAlertDialog("Payment Response", response.getPayment().getJSONObject().toString());
                 } else {
@@ -867,7 +849,14 @@ public class GoPOSActivity extends Activity {
     }
 
     private void setConnectedStatus(MerchantInfo merchantInfo) {
-        mMerchantInfoTxtVw.setText(String.format(merchantInfo.getDeviceInfo().getModel() + " Connected: %s (%s)", merchantInfo.getDeviceInfo().getSerial(), merchantInfo.getMerchantName()));
+        merchantInfoTxtVw.setText(String.format(merchantInfo.getDeviceInfo().getModel() + " Connected: %s (%s)",
+                merchantInfo.getDeviceInfo().getSerial(),
+                merchantInfo.getMerchantName()));
+    }
+
+    private void setDisconnectedStatus() {
+        String name = merchantInfo != null ? merchantInfo.getMerchantName() : "";
+        merchantInfoTxtVw.setText("Merchant: " + name);
     }
 
     public void captureCardClick(View view) {
@@ -889,18 +878,18 @@ public class GoPOSActivity extends Activity {
     private void createCloverGoConnector(ReaderInfo.ReaderType readerType) {
         goReaderType = readerType;
 
-        if (cloverGoConnectorMap.get(readerType) == null) {
+        if (cGoConnectorMap.get(readerType) == null) {
             CloverGoDeviceConfiguration config = new CloverGoDeviceConfiguration
                     .Builder(getApplicationContext(),
-                    mStartupParams.getAccessToken(),
-                    mStartupParams.getEnvironment(),
-                    mStartupParams.getApiKey(),
-                    mStartupParams.getSecret(),
-                    mStartupParams.getAppId(),
-                    mStartupParams.getAppVersion())
+                    startupParams.getAccessToken(),
+                    startupParams.getEnvironment(),
+                    startupParams.getApiKey(),
+                    startupParams.getSecret(),
+                    startupParams.getAppId(),
+                    startupParams.getAppVersion())
                     .deviceType(readerType)
                     .allowAutoConnect(false)
-                    .enableQuickChip(mStartupParams.isQuickChip())
+                    .enableQuickChip(startupParams.isQuickChip())
                     .build();
 
             ICloverGoConnector cloverGoConnector = (CloverGoConnector) ConnectorFactory.createCloverConnector(config);
@@ -908,19 +897,22 @@ public class GoPOSActivity extends Activity {
         }
     }
 
-    private void showPaymentInfo(Payment payment) {
+    private void showPaymentInfo(PaymentResponse response) {
+        Payment payment = response.getPayment();
         showAlertDialog("Payment Info",
                 "Payment ID: " + payment.getId()
-                + "\nPayment External ID: " + payment.getExternalPaymentId()
-                + "\nOrder ID: " + payment.getOrder().getId()
-                + "\nAmount: " + payment.getAmount()
-                + "\nCard Holder Name: " + payment.getCardTransaction().getCardholderName()
-                + "\nCard Type: " + payment.getCardTransaction().getCardType()
-                + "\nTransaction Type: " + payment.getCardTransaction().getType()
-                + "\nEntry Type: " + payment.getCardTransaction().getEntryType()
-                + "\nAuth Code: " + payment.getCardTransaction().getAuthCode()
-                + "\nFirst 6: " + payment.getCardTransaction().getFirst6()
-                + "\nLast 4: " + payment.getCardTransaction().getLast4());
+                        + "\nPayment External ID: " + payment.getExternalPaymentId()
+                        + "\nOrder ID: " + payment.getOrder().getId()
+                        + "\nAmount: " + payment.getAmount()
+                        + "\nCard Holder Name: " + payment.getCardTransaction().getCardholderName()
+                        + "\nCard Type: " + payment.getCardTransaction().getCardType()
+                        + "\nTransaction Type: " + payment.getCardTransaction().getType()
+                        + "\nEntry Type: " + payment.getCardTransaction().getEntryType()
+                        + "\nAuth Code: " + payment.getCardTransaction().getAuthCode()
+                        + "\nFirst 6: " + payment.getCardTransaction().getFirst6()
+                        + "\nLast 4: " + payment.getCardTransaction().getLast4()
+                        + "\nCVM Result: " + response.getPaymentCvmResult()
+                        + "\nApplication Identifier: " + payment.getCardTransaction().getExtra().get(CARD_TRANSACTION_EXTRA_APPLICATION_IDENTIFIER));
     }
 
     private void showPaymentConfirmation(PaymentConfirmationListener listenerIn, Challenge challengeIn, int challengeIndexIn) {
@@ -939,19 +931,16 @@ public class GoPOSActivity extends Activity {
                                      PaymentConfirmationListener listenerIn, Challenge challengeIn,
                                      int challengeIndexIn) {
 
-        new AlertDialog.Builder(this)
-                .setTitle(titleResId)
-                .setMessage(challengeIn.message)
-                .setCancelable(false)
-                .setPositiveButton(positiveButtonResId, (dialog, which) -> {
+        showConfirmDialog(getString(titleResId), challengeIn.message, getString(positiveButtonResId), getString(negativeButtonResId),
+                (dialog, which) -> {
                     listenerIn.onAcceptClicked(challengeIndexIn);
                     dialog.dismiss();
-                })
-                .setNegativeButton(negativeButtonResId, (dialog, which) -> {
+                },
+                (dialog, which) -> {
                     listenerIn.onRejectClicked(challengeIn);
                     dialog.dismiss();
-                })
-                .show();
+                }
+        );
     }
 
     public void showOrders() {
@@ -959,12 +948,12 @@ public class GoPOSActivity extends Activity {
             return;
         }
 
-        OrdersFragment orders = OrdersFragment.newInstance(mProcessedOrders, cloverConnector);
+        OrdersFragment orders = OrdersFragment.newInstance(processedOrders, cloverConnector);
         showFragment(orders);
     }
 
     public void showRegister() {
-        showRegister(mPreAuthPayments);
+        showRegister(preAuthPayments);
     }
 
     public void showRegister(List<GoPayment> preAuthPayments) {
@@ -987,7 +976,7 @@ public class GoPOSActivity extends Activity {
 
         MiscFragment misc = MiscFragment.newInstance();
         if (isReadCard) {
-            misc = MiscFragment.newInstance(cloverGoConnectorMap.get(RP450));
+            misc = MiscFragment.newInstance(cGoConnectorMap.get(RP450));
         }
         showFragment(misc);
     }
@@ -1010,7 +999,7 @@ public class GoPOSActivity extends Activity {
         createCloverGoConnector(RP350);
 
         if (merchantInfoMap.get(RP350) == null) {
-            cloverGoConnectorMap.get(RP350).initializeConnection();
+            cGoConnectorMap.get(RP350).initializeConnection();
 
         } else {
             showToast("Reader 350 Already Connected");
@@ -1019,14 +1008,15 @@ public class GoPOSActivity extends Activity {
 
     public void connect450Click() {
         if (isBluetoothEnabled() && isGPSEnabled()) {
+            showToast("If you don't see your readers, check and make sure you have granted this sample app location permission. This is needed to detect bluetooth readers (RP450)");
             createCloverGoConnector(RP450);
 
             if (merchantInfoMap.get(RP450) == null) {
-                mPreferred450Reader = PreferenceUtil.getStringValue(this, MiscFragment.PREF_450);
-                mArrayListReadersList = new ArrayList<>();
-                mArrayListReaderString = new ArrayList<>();
+                preferred450Reader = PreferenceUtil.getStringValue(this, MiscFragment.PREF_450);
+                arrayListReadersList = new ArrayList<>();
+                arrayListReaderString = new ArrayList<>();
 
-                cloverGoConnectorMap.get(RP450).initializeConnection();
+                cGoConnectorMap.get(RP450).initializeConnection();
                 showBluetoothReaders();
 
             } else {
@@ -1034,7 +1024,7 @@ public class GoPOSActivity extends Activity {
 
             }
         } else {
-            showToast("Enable GPS and Bluetooth");
+            showToast("Enable GPS and Bluetooth. Make sure to grant location permission as well.");
 
         }
     }
@@ -1044,9 +1034,9 @@ public class GoPOSActivity extends Activity {
     }
 
     public void disconnect450() {
-        ICloverGoConnector cloverGoConnector = cloverGoConnectorMap.get(ReaderInfo.ReaderType.RP450);
+        ICloverGoConnector cloverGoConnector = cGoConnectorMap.get(ReaderInfo.ReaderType.RP450);
 
-        if (cloverGoConnectorMap.get(ReaderInfo.ReaderType.RP450) != null) {
+        if (cGoConnectorMap.get(ReaderInfo.ReaderType.RP450) != null) {
             cloverGoConnector.disconnectDevice();
 
         } else {
@@ -1076,18 +1066,18 @@ public class GoPOSActivity extends Activity {
             readerListDialog.dismiss();
         });
 
-        mReaderArrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, android.R.id.text1, mArrayListReaderString);
+        readerArrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, android.R.id.text1, arrayListReaderString);
         ListView mBluetoothReadersListVw = readerListDialog.findViewById(R.id.dialogList);
-        mBluetoothReadersListVw.setAdapter(mReaderArrayAdapter);
+        mBluetoothReadersListVw.setAdapter(readerArrayAdapter);
         mBluetoothReadersListVw.setOnItemClickListener((parent, view, position, id) -> {
-            ReaderInfo readerInfo = mArrayListReadersList.get(position);
+            ReaderInfo readerInfo = arrayListReadersList.get(position);
             if (iCloverGoConnector != null) {
                 iCloverGoConnector.connectToBluetoothDevice(readerInfo);
             }
             showToast(readerInfo.getBluetoothName() + "\n" + readerInfo.getBluetoothIdentifier());
             readerListDialog.dismiss();
         });
-        mReaderArrayAdapter.notifyDataSetChanged();
+        readerArrayAdapter.notifyDataSetChanged();
 
         readerListDialog.show();
     }
@@ -1107,29 +1097,41 @@ public class GoPOSActivity extends Activity {
     }
 
     private ICloverConnector getCloverConnector() {
-        if (goReaderType != null && cloverGoConnectorMap.get(goReaderType) != null) {
-            return cloverGoConnectorMap.get(goReaderType);
+        if (goReaderType != null && cGoConnectorMap.get(goReaderType) != null) {
+            return cGoConnectorMap.get(goReaderType);
         } else {
             return null;
         }
     }
 
     public void showProgressDialog(String title, String message, boolean isCancelable) {
-        dismissDialog();
+        dismissDialogs();
         progressDialog = DialogHelper.showProgressDialog(this, title, message, isCancelable, "Cancel", (dialog, which) -> getCloverConnector().cancel());
         progressDialog.show();
     }
 
-    public void showAlertDialog(String title, String message) {
-        dismissDialog();
-        alertDialog = DialogHelper.createAlertDialog(this, title, message, "OK", (dialog, which) -> dialog.dismiss());
+    public void showAlertDialog(String title, String message, DialogInterface.OnClickListener... listener) {
+        dismissDialogs();
+        alertDialog = DialogHelper.createAlertDialog(this, title, message, "OK", listener.length > 0 ? listener[0] : (dialog, which) -> dialog.dismiss());
         alertDialog.show();
     }
 
-    private void dismissDialog() {
+    public void showConfirmDialog(String title, String message, String positiveTxt,
+                                  String negativeTxt, DialogInterface.OnClickListener positiveBtnListener,
+                                  DialogInterface.OnClickListener negativeBtnListener) {
+        dismissDialogs();
+        confirmDialog = DialogHelper.createConfirmDialog(this, title, message,
+                positiveTxt, negativeTxt, positiveBtnListener, negativeBtnListener);
+        confirmDialog.show();
+    }
+
+    private void dismissDialogs() {
         hideKeyboard();
         if (alertDialog != null && alertDialog.isShowing()) {
             alertDialog.dismiss();
+        }
+        if (confirmDialog != null && confirmDialog.isShowing()) {
+            confirmDialog.dismiss();
         }
         if (progressDialog != null && progressDialog.isShowing()) {
             progressDialog.dismiss();
@@ -1137,11 +1139,11 @@ public class GoPOSActivity extends Activity {
     }
 
     public void showToast(String message) {
-        if (mToast == null) {
-            mToast = Toast.makeText(this, "", Toast.LENGTH_SHORT);
+        if (toast == null) {
+            toast = Toast.makeText(this, "", Toast.LENGTH_SHORT);
         }
-        mToast.setText(message);
-        mToast.show();
+        toast.setText(message);
+        toast.show();
     }
 
     public boolean isValidAmount(TextView view) {
@@ -1158,12 +1160,7 @@ public class GoPOSActivity extends Activity {
 
     private boolean isBluetoothEnabled() {
         BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        if (mBluetoothAdapter != null && !mBluetoothAdapter.isEnabled()) {
-            showToast("Turn on Bluetooth to connect 450 reader");
-            return false;
-        } else {
-            return true;
-        }
+        return mBluetoothAdapter == null || mBluetoothAdapter.isEnabled();
     }
 
     private boolean isGPSEnabled() {
@@ -1173,24 +1170,24 @@ public class GoPOSActivity extends Activity {
 
     public int getDefaultCloverGoCardEntryMethods() {
         return Constants.CARD_ENTRY_METHOD_MANUAL |
-               Constants.CARD_ENTRY_METHOD_ICC_CONTACT |
-               Constants.CARD_ENTRY_METHOD_NFC_CONTACTLESS;
+                Constants.CARD_ENTRY_METHOD_ICC_CONTACT |
+                Constants.CARD_ENTRY_METHOD_NFC_CONTACTLESS;
     }
 
     public int getCloverGoCardEntryMethodState() {
-        return mCardEntryMethodState;
+        return cardEntryMethodState;
     }
 
     public void setCloverGoCardEntryMethodState(int state) {
-        mCardEntryMethodState = state;
+        cardEntryMethodState = state;
     }
 
     private void addNewProcessedOrder(GoOrder order) {
-        mProcessedOrders.add(order);
+        processedOrders.add(order);
 
         GoPayment payment = (GoPayment) order.getPayments().get(0);
-        mProcessedOrdersMap.put(payment.getPayment().getId(), order);
-        mProcessedPaymentsMap.put(payment.getPayment().getId(), payment);
+        processedOrdersMap.put(payment.getPayment().getId(), order);
+        processedPaymentsMap.put(payment.getPayment().getId(), payment);
     }
 
     private void showFragment(BaseFragment fragment) {
@@ -1202,11 +1199,11 @@ public class GoPOSActivity extends Activity {
     private void disableOrEnableBottomBar(String fragmentTag) {
         if (fragmentTag.equals(SignatureFragment.TAG) || fragmentTag.equals(SendReceiptFragment.TAG)) {
 
-            mBottomNavigationView.setOnNavigationItemSelectedListener(null);
+            navigationView.setOnNavigationItemSelectedListener(null);
 
         } else if (isReadCardDemo) {
 
-            mBottomNavigationView.setOnNavigationItemSelectedListener(item -> {
+            navigationView.setOnNavigationItemSelectedListener(item -> {
                 if (item.getItemId() == R.id.action_misc) {
                     showMiscReadCard(true);
                 }
@@ -1214,8 +1211,34 @@ public class GoPOSActivity extends Activity {
             });
 
         } else {
-            mBottomNavigationView.setOnNavigationItemSelectedListener(bottomNavigationListener);
+            navigationView.setOnNavigationItemSelectedListener(getNavigationListener());
         }
+    }
+
+    private BottomNavigationView.OnNavigationItemSelectedListener getNavigationListener() {
+        if (navigationListener == null) {
+            navigationListener = item -> {
+                switch (item.getItemId()) {
+                    case R.id.action_register:
+                        showRegister();
+                        break;
+                    case R.id.action_orders:
+                        showOrders();
+                        break;
+                    case R.id.action_misc:
+                        showMisc();
+                        break;
+                    case R.id.action_manual_refund:
+                        showManualRefunds();
+                        break;
+                    case R.id.action_vault_card:
+                        showVaultCards();
+                        break;
+                }
+                return true;
+            };
+        }
+        return navigationListener;
     }
 
     private boolean isFragmentVisible(String tag) {

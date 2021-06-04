@@ -14,125 +14,140 @@
   ~ limitations under the License.
   -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:tools="http://schemas.android.com/tools"
-              android:id="@+id/MiscParentScrollView"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:orientation="vertical"
-              android:padding="11dp">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/MiscParentScrollView"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="11dp">
 
-  <ScrollView android:layout_width="match_parent"
-              android:layout_height="match_parent">
-    <LinearLayout android:layout_width="match_parent"
-                  android:layout_height="wrap_content"
-                  android:orientation="vertical">
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-      <LinearLayout
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          android:orientation="horizontal">
-
-        <Button
-            android:id="@+id/connectReader450Btn"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginRight="5dp"
-            android:layout_weight="1"
-            android:background="@drawable/btn_rounded"
-            android:text="Connect RP450"/>
+            android:orientation="vertical">
 
-        <Button
-            android:id="@+id/updateReaderBtn"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/btn_rounded"
-            android:layout_marginRight="5dp"
-            android:layout_weight="1"
-            android:visibility="gone"
-            android:text="Update Reader"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
 
-        <Button
-            android:id="@+id/disconnectReaderBtn"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_weight="1"
-            android:background="@drawable/btn_rounded"
-            android:text="Disconnect RP450"/>
-      </LinearLayout>
+                <Button
+                    android:id="@+id/connectReader450Btn"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="5dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/btn_rounded"
+                    android:text="Connect RP450" />
 
-      <EditText
-          android:id="@+id/reader450PrefEditTxt"
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          android:layout_marginLeft="33dp"
-          android:layout_marginRight="33dp"
-          android:gravity="center_horizontal"
-          android:hint="Auto Connect Reader #"
-          android:padding="11dp"/>
+                <Button
+                    android:id="@+id/updateReaderBtn"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="5dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/btn_rounded"
+                    android:text="Update Reader"
+                    android:visibility="gone" />
 
-      <Button
-          android:id="@+id/connectReader350Btn"
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          android:layout_alignParentLeft="true"
-          android:layout_marginTop="11dp"
-          android:background="@drawable/btn_rounded"
-          android:text="Connect RP350"/>
+                <Button
+                    android:id="@+id/disconnectReaderBtn"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_weight="1"
+                    android:background="@drawable/btn_rounded"
+                    android:text="Disconnect RP450" />
+            </LinearLayout>
 
-      <LinearLayout
-          android:id="@+id/TransactionSettings"
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          android:orientation="vertical"
-          android:padding="11dp">
+            <EditText
+                android:id="@+id/reader450PrefEditTxt"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="33dp"
+                android:layout_marginRight="33dp"
+                android:gravity="center_horizontal"
+                android:hint="Auto Connect Reader #"
+                android:inputType="number"
+                android:padding="11dp" />
 
-        <TextView
-            android:id="@+id/textView9"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/transaction_settings"
-            android:textSize="24sp"
-            android:textStyle="normal|bold"/>
+            <Button
+                android:id="@+id/connectReader350Btn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_marginTop="11dp"
+                android:background="@drawable/btn_rounded"
+                android:text="Connect RP350" />
 
-        <Switch
-            android:id="@+id/ManualSwitch"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="11dp"
-            android:text="@string/manual"/>
+            <LinearLayout
+                android:id="@+id/TransactionSettings"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="11dp">
 
-        <Switch
-            android:id="@+id/SwipeSwitch"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="11dp"
-            android:visibility="gone"
-            android:text="@string/swipe"/>
+                <TextView
+                    android:id="@+id/textView9"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/transaction_settings"
+                    android:textSize="24sp"
+                    android:textStyle="normal|bold" />
 
-        <Switch
-            android:id="@+id/ChipSwitch"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="11dp"
-            android:text="@string/chip"/>
+                <Switch
+                    android:id="@+id/ManualSwitch"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="11dp"
+                    android:text="@string/manual" />
 
-        <Switch
-            android:id="@+id/ContactlessSwitch"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="11dp"
-            android:text="@string/contactless"/>
-      </LinearLayout>
+                <Switch
+                    android:id="@+id/SwipeSwitch"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="11dp"
+                    android:text="@string/swipe"
+                    android:visibility="gone" />
 
-      <Button
-          android:id="@+id/getLogsBtn"
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          android:layout_marginTop="11dp"
-          android:background="@drawable/btn_rounded"
-          android:text="Get Logs"/>
+                <Switch
+                    android:id="@+id/ChipSwitch"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="11dp"
+                    android:text="@string/chip" />
 
-    </LinearLayout>
-  </ScrollView>
+                <Switch
+                    android:id="@+id/ContactlessSwitch"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="11dp"
+                    android:text="@string/contactless" />
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/getLogsBtn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="11dp"
+                android:background="@drawable/btn_rounded"
+                android:text="Get Logs" />
+
+            <EditText
+                android:id="@+id/signatureEditTxt"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="33dp"
+                android:layout_marginTop="11dp"
+                android:layout_marginRight="33dp"
+                android:gravity="center_horizontal"
+                android:hint="Signature Threshold (Cents)"
+                android:inputType="number"
+                android:padding="11dp" />
+        </LinearLayout>
+    </ScrollView>
 </LinearLayout>

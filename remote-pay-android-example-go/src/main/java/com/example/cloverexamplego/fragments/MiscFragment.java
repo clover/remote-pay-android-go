@@ -1,8 +1,5 @@
 package com.example.cloverexamplego.fragments;
 
-import com.clover.remote.client.Constants;
-import com.clover.remote.client.clovergo.ICloverGoConnector;
-
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -12,12 +9,16 @@ import android.view.ViewGroup;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Switch;
+
+import com.clover.remote.client.Constants;
+import com.clover.remote.client.clovergo.ICloverGoConnector;
 import com.example.cloverexamplego.R;
 import com.example.cloverexamplego.utils.PreferenceUtil;
 
 public class MiscFragment extends BaseFragment {
     public static final String TAG = "MiscFragment";
     public static final String PREF_450 = "PREF_450";
+    public static final String PREF_SIGN_AMOUNT = "PREF_SIGN_AMOUNT";
 
     private ICloverGoConnector mCloverConnector;
 
@@ -58,6 +59,23 @@ public class MiscFragment extends BaseFragment {
             }
         });
 
+        String signatureThreshold = PreferenceUtil.getStringValue(getPOSActivity(), PREF_SIGN_AMOUNT);
+        EditText signAmountEditTxt = view.findViewById(R.id.signatureEditTxt);
+        signAmountEditTxt.setText(signAmountEditTxt == null ? "" : signatureThreshold);
+        signAmountEditTxt.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                PreferenceUtil.saveString(getPOSActivity(), PREF_SIGN_AMOUNT, editable.toString());
+            }
+        });
 
         view.findViewById(R.id.connectReader450Btn).setOnClickListener(view1 -> getPOSActivity().connect450Click());
         view.findViewById(R.id.disconnectReaderBtn).setOnClickListener(view1 -> getPOSActivity().disconnect450());

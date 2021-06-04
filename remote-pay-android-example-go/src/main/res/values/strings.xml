@@ -128,7 +128,6 @@
     <string name="pre_authorized">Pre-Authorized</string>
     <string name="pre_authorizations">Pre Authorizations</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="offline_transaction_info">No offline transactions to display</string>
     <string name="amount_title">Amount :</string>
     <string name="payment_id_title">Payment Id :</string>
@@ -145,6 +144,8 @@
     <string name="internet_connectivity_warn">Please Check for Internet Connectivity</string>
     <string name="payment_note_title">Payment Note:</string>
     <string name="payment_note_hint">Sample Payment Note (Optional)</string>
+    <string name="invoice_note_title">Invoice Note:</string>
+    <string name="invoice_note_hint">Sample Invoice Note (Optional)</string>
     <string name="offline_transaction_lbl">Save Offline Transaction</string>
     <string name="tip_adjust_hint">Enter amount in cents</string>
 

@@ -36,9 +36,5 @@
         <activity
             android:name=".activities.WebViewActivity"
             android:screenOrientation="sensorPortrait" />
-
-        <meta-data
-            android:name="io.fabric.ApiKey"
-            android:value="43bf7f63d61fb948f3ac6e95ff6b5e0cff45fb3e" />
     </application>
 </manifest>

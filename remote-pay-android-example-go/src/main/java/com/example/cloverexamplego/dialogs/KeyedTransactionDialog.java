@@ -2,11 +2,12 @@ package com.example.cloverexamplego.dialogs;
 
 import android.app.DialogFragment;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+
+import androidx.annotation.Nullable;
 
 import com.clover.remote.client.clovergo.CloverGoConstants.TransactionType;
 import com.clover.remote.client.clovergo.ICloverGoConnectorListener;
@@ -120,6 +121,7 @@ public class KeyedTransactionDialog extends BaseDialog {
                 }
                 if (request != null) {
                     request.setNote(transactionRequest.getNote());
+                    request.setInvoiceNum(transactionRequest.getInvoiceNum());
                     doneKeyEntry(request, mTransactionType);
                 }
             } else {

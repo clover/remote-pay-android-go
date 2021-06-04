@@ -1,13 +1,15 @@
 package com.example.cloverexamplego.fragments;
 
-import com.clover.remote.client.clovergo.ICloverGoConnectorListener;
-
 import android.gesture.GestureOverlayView;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.clover.remote.client.clovergo.ICloverGoConnectorListener;
 import com.example.cloverexamplego.R;
+
+import java.util.ArrayList;
 
 public class SignatureFragment extends BaseFragment {
     public static final String TAG = "SignatureFragment";
@@ -31,8 +33,9 @@ public class SignatureFragment extends BaseFragment {
 
         view.findViewById(R.id.AcceptButton).setOnClickListener(v -> {
             if (signatureView.getGesture() != null) {
+                ArrayList<int[][]> signatureXY = new ArrayList<>();
                 float[] points;
-                int[][] xy = null;
+                int[][] xy;
                 int count;
 
                 for (int i = 0; i < signatureView.getGesture().getStrokesCount(); i++) {
@@ -45,8 +48,10 @@ public class SignatureFragment extends BaseFragment {
                         xy[count][1] = (int) points[j + 1];
                         count++;
                     }
+
+                    signatureXY.add(xy);
                 }
-                mSignatureCaptureListnr.captureSignature(mPaymentID, xy);
+                mSignatureCaptureListnr.captureSignature(mPaymentID, signatureXY);
             } else {
                 getPOSActivity().showToast("Please Sign...");
             }
