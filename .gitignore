@@ -16,7 +16,6 @@ gen/
 .gradle/
 build/
 /*/build/
-gradle/
 
 -# Local configuration file (sdk path, etc)
 local.properties
