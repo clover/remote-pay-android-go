@@ -3,6 +3,7 @@ package com.example.cloverexamplego.fragments;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.os.Bundle;
+import android.text.InputType;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,7 +12,6 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.clover.remote.client.ICloverConnector;
 import com.clover.remote.client.clovergo.ICloverGoConnector;
 import com.clover.remote.client.messages.AuthRequest;
@@ -22,14 +22,12 @@ import com.clover.remote.client.messages.SaleRequest;
 import com.clover.remote.client.messages.TransactionRequest;
 import com.example.cloverexamplego.R;
 import com.example.cloverexamplego.adapters.PreAuthListViewAdapter;
+import static com.example.cloverexamplego.fragments.MiscFragment.PREF_SIGN_AMOUNT;
 import com.example.cloverexamplego.model.GoPayment;
 import com.example.cloverexamplego.utils.IdUtils;
 import com.example.cloverexamplego.utils.PreferenceUtil;
-
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.example.cloverexamplego.fragments.MiscFragment.PREF_SIGN_AMOUNT;
 
 public class RegisterFragment extends BaseFragment {
     public static final String TAG = "RegisterFragment";
@@ -45,6 +43,7 @@ public class RegisterFragment extends BaseFragment {
     private PreAuthListViewAdapter preAuthListAdapter;
 
     private List<GoPayment> preAuthPayments = new ArrayList<>();
+    private long tipAmount = 0;
 
     public static RegisterFragment newInstance(ICloverConnector cloverConnector, List<GoPayment> preAuthPayments) {
         RegisterFragment registerFragment = new RegisterFragment();
@@ -56,11 +55,14 @@ public class RegisterFragment extends BaseFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_register, container, false);
-
         mAmtEditTxt = view.findViewById(R.id.regAmtEditTxt);
         mPaymentNoteEditTxt = view.findViewById(R.id.regPaymentNote);
         invoiceNoteEditTxt = view.findViewById(R.id.regInvoiceNote);
-        view.findViewById(R.id.regSaleBtn).setOnClickListener(v -> doSaleTransaction());
+        view.findViewById(R.id.regSaleBtn).setOnClickListener(v -> {
+            if (isValidAmount()) {
+                alertAddTipAmount();
+            }
+        });
         view.findViewById(R.id.regAuthBtn).setOnClickListener(v -> doAuthTransaction());
         view.findViewById(R.id.regCloseoutButton).setOnClickListener(v -> closeOutPendingTransactions());
         view.findViewById(R.id.regPreAuthBtn).setOnClickListener(v -> doPreAuthTransaction());
@@ -117,6 +119,8 @@ public class RegisterFragment extends BaseFragment {
     private void doSaleTransaction() {
         if (isValidAmount()) {
             SaleRequest request = new SaleRequest(Long.valueOf(mAmtEditTxt.getText().toString()), IdUtils.getNextId());
+            request.setTipMode(SaleRequest.TipMode.TIP_PROVIDED);
+            request.setTipAmount(tipAmount);
             updateTransactionRequest(request);
             mCloverConnector.sale(request);
         }
@@ -167,4 +171,23 @@ public class RegisterFragment extends BaseFragment {
         return TAG;
     }
 
+    private void alertAddTipAmount() {
+        EditText input = new EditText(getActivity());
+        input.setHint(R.string.tip_adjust_hint);
+        input.setInputType(InputType.TYPE_CLASS_NUMBER);
+        new AlertDialog.Builder(getActivity())
+                .setTitle("Do you want to add tip amount?")
+                .setView(input)
+                .setPositiveButton(android.R.string.ok, (dialog1, which) -> {
+                    if (getPOSActivity().isValidAmount(input)) {
+                        tipAmount = Long.parseLong(input.getText().toString());
+                        doSaleTransaction();
+                        dialog1.dismiss();
+                    }
+                })
+                .setNegativeButton(android.R.string.cancel, (dialog12, which) -> {
+                    doSaleTransaction();
+                    dialog12.cancel();
+                }).show();
+    }
 }

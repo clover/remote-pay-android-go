@@ -40,7 +40,8 @@ public class OrdersListViewAdapter extends ArrayAdapter<GoOrder> {
         idColumn.setText(order.getId());
         dateColumn.setText(order.getDate().toString());
         statusColumn.setText(((GoPayment) order.getPayments().get(0)).getStatus().name());
-        totalColumn.setText(CurrencyUtils.format(order.getAmount(), Locale.getDefault()));
+        long totalAmt = order.getAmount() + (order.getTipAmount() > 0 ? order.getTipAmount() : ((GoPayment) order.getPayments().get(0)).getTipAmount());
+        totalColumn.setText(CurrencyUtils.format(totalAmt, Locale.getDefault()));
 
         return view;
     }

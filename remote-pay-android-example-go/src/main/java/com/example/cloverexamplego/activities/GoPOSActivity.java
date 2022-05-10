@@ -509,8 +509,9 @@ public class GoPOSActivity extends Activity {
                 dismissDialogs();
 
                 if (response.isSuccess()) {
-                    addNewProcessedOrder(new GoOrder(new GoPayment(response)));
-
+                    GoOrder goOrder = new GoOrder(new GoPayment(response));
+                    goOrder.setTipAmount(response.getPayment().getTipAmount());
+                    addNewProcessedOrder(goOrder);
                     showRegister();
                     showPaymentInfo(response);
                     showToast("Sale successfully processed");
@@ -904,6 +905,7 @@ public class GoPOSActivity extends Activity {
                         + "\nPayment External ID: " + payment.getExternalPaymentId()
                         + "\nOrder ID: " + payment.getOrder().getId()
                         + "\nAmount: " + payment.getAmount()
+                        + "\nTip Amount: " + payment.getTipAmount()
                         + "\nCard Holder Name: " + payment.getCardTransaction().getCardholderName()
                         + "\nCard Type: " + payment.getCardTransaction().getCardType()
                         + "\nTransaction Type: " + payment.getCardTransaction().getType()

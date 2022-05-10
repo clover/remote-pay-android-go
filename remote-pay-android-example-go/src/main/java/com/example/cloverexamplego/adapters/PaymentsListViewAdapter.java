@@ -43,7 +43,7 @@ public class PaymentsListViewAdapter extends ArrayAdapter<GoExchange> {
             String externalPaymentId = payment.getPayment().getExternalPaymentId();
 
             paymentStatus.setText(payment.getStatus().name());
-            paymentTip.setText(CurrencyUtils.format(payment.getTipAmount(), Locale.getDefault()));
+            paymentTip.setText(payment.getTipAmount() > 0 ? CurrencyUtils.format(payment.getTipAmount(), Locale.getDefault()) : CurrencyUtils.format(payment.getPayment().getTipAmount(), Locale.getDefault()));
             paymentAmount.setText(CurrencyUtils.format(payment.getPayment().getAmount(), Locale.getDefault()));
             paymentExternalId.setText(externalPaymentId != null ? externalPaymentId : "<unset ext id>");
 

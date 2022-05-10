@@ -9,7 +9,6 @@ apply plugin: 'com.android.application'
 
 repositories {
   maven { url "https://oss.sonatype.org/content/repositories/releases" }
-  maven { url 'https://maven.fabric.io/public' }
 }
 
 android {
@@ -20,8 +19,8 @@ android {
     applicationId "com.example.cloverexamplego"
     minSdkVersion 19
     targetSdkVersion 30
-    versionCode 4
-    versionName "3.3.2"
+    versionCode 5
+    versionName "3.3.3"
 
     multiDexEnabled true
   }
@@ -47,7 +46,7 @@ android {
 dependencies {
   // SDK Dependencies
   api project(':roam')
-  implementation ("com.firstdata.clovergo:remote-pay-android-go-connector:3.3.2-rc1@aar") {
+  implementation ("com.firstdata.clovergo:remote-pay-android-go-connector:3.3.3-rc1@aar") {
     transitive = true
   }
 

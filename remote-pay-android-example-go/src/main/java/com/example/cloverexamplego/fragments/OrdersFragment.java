@@ -257,9 +257,9 @@ public class OrdersFragment extends BaseFragment {
                         }
 
                         if (goOrder.getAmount() == totalRefund) {
-                            ((GoPayment)goOrder.getPayments().get(0)).setStatus(GoPayment.Status.REFUNDED);
+                            ((GoPayment) goOrder.getPayments().get(0)).setStatus(GoPayment.Status.REFUNDED);
                         } else {
-                            ((GoPayment)goOrder.getPayments().get(0)).setStatus(GoPayment.Status.PARTIALLYREFUNDED);
+                            ((GoPayment) goOrder.getPayments().get(0)).setStatus(GoPayment.Status.PARTIALLYREFUNDED);
                         }
 
                         mPaymentsList.addAll(mGoOrdersMap.get(response.getOrderId()).getPayments());

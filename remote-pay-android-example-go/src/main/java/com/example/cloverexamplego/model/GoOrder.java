@@ -10,6 +10,7 @@ public class GoOrder {
     private List<GoExchange> payments;
     private Date date;
     private long amount;
+    private long tipAmount = 0;
 
     public GoOrder(GoPayment goPayment) {
         this.id = goPayment.getPayment().getOrder().getId();
@@ -18,6 +19,14 @@ public class GoOrder {
 
         payments = new ArrayList<>();
         payments.add(goPayment);
+    }
+
+    public long getTipAmount() {
+        return tipAmount;
+    }
+
+    public void setTipAmount(long tipAmount) {
+        this.tipAmount = tipAmount;
     }
 
     public String getId() {

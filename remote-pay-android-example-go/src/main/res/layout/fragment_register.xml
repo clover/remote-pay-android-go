@@ -47,8 +47,23 @@
         android:layout_height="wrap_content"
         android:hint="@string/invoice_note_hint"
         android:maxLength="12"
-        android:maxLines="1" />
-
+        android:maxLines="1"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Tip Amount"
+        android:layout_marginTop="4dp"
+        android:visibility="gone"
+        android:layout_marginBottom="4dp"/>
+    <EditText
+        android:id="@+id/regTipAmount"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Tip Amount in Cents"
+        android:visibility="gone"
+        android:inputType="number"
+        android:maxLength="8"
+        android:maxLines="1"/>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
