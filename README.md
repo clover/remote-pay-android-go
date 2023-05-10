@@ -1,3 +1,9 @@
+## DEPRECATED
+
+### Please note, this project is deprecated and no longer being maintained.
+
+----------
+
 ![alt text](https://cloverstatic.com/web/mfe/cloverDotCom/a602c27/assets/media/clover-logo.edbc4305491103b5b633.svg)
 
 # Clover SDK for Android POS integration
